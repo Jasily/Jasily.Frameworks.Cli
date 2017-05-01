@@ -47,9 +47,9 @@ namespace Jasily.Frameworks.Cli.IO
 
                 bool IsOptional()
                 {
-                    if (parameter.IsArray && parameter.ArrayMinLength is uint val)
+                    if (parameter.IsArray && parameter.ArrayMinLength > 0)
                     {
-                        return val == 0;
+                        return false;
                     }
 
                     return parameter.ParameterInfo.HasDefaultValue;

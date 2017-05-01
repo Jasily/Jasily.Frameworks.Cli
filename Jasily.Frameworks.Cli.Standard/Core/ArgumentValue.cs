@@ -45,7 +45,7 @@ namespace Jasily.Frameworks.Cli.Core
         {
             if (this.Parameter.IsArray)
             {
-                if (this.Parameter.ArrayMinLength != null)
+                if (this.Parameter.ArrayMinLength > 0)
                 {
                     if (this.Parameter.ArrayMinLength > this.Values.Count)
                     {
@@ -54,7 +54,7 @@ namespace Jasily.Frameworks.Cli.Core
                     }
                 }
 
-                if (this.Parameter.ArrayMaxLength != null)
+                if (this.Parameter.ArrayMaxLength > 0)
                 {
                     if (this.Parameter.ArrayMaxLength < this.Values.Count)
                     {

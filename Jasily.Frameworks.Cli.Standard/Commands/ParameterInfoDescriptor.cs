@@ -91,12 +91,12 @@ namespace Jasily.Frameworks.Cli.Commands
         /// <summary>
         /// array constraints: min length
         /// </summary>
-        public uint? ArrayMinLength { get; }
+        public int ArrayMinLength { get; }
 
         /// <summary>
         /// arrat constraints: max length
         /// </summary>
-        public uint? ArrayMaxLength { get; }
+        public int ArrayMaxLength { get; }
 
         #endregion
     }
