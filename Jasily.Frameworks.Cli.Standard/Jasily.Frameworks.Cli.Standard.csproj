@@ -5,9 +5,13 @@
     <RootNamespace>Jasily.Frameworks.Cli</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\netstandard1.4\Jasily.Frameworks.Cli.Standard.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Jasily.DependencyInjection.MemberInjection.Standard" Version="0.0.1" />
-    <PackageReference Include="Jasily.DependencyInjection.MethodInvoker.Standard" Version="0.0.1.1" />
+    <PackageReference Include="Jasily.DependencyInjection.MethodInvoker.Standard" Version="0.0.1.3" />
     <PackageReference Include="JetBrains.Annotations" Version="10.4.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="1.1.0" />
   </ItemGroup>

@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jasily.Frameworks.Cli.Standard", "Jasily.Frameworks.Cli.Standard\Jasily.Frameworks.Cli.Standard.csproj", "{AC0055B6-365A-44C1-A969-29135A6A96BF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jasily.Frameworks.Cli.Tests", "Jasily.Frameworks.Cli.Tests\Jasily.Frameworks.Cli.Tests.csproj", "{4986BE84-6118-49BB-BA9A-8AF01A5E9F45}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jasily.Frameworks.Cli.NetFramework", "Jasily.Frameworks.Cli.NetFramework\Jasily.Frameworks.Cli.NetFramework.csproj", "{DEC14955-8266-498D-8266-A4006AD75665}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{AC0055B6-365A-44C1-A969-29135A6A96BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC0055B6-365A-44C1-A969-29135A6A96BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC0055B6-365A-44C1-A969-29135A6A96BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4986BE84-6118-49BB-BA9A-8AF01A5E9F45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4986BE84-6118-49BB-BA9A-8AF01A5E9F45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4986BE84-6118-49BB-BA9A-8AF01A5E9F45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4986BE84-6118-49BB-BA9A-8AF01A5E9F45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEC14955-8266-498D-8266-A4006AD75665}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEC14955-8266-498D-8266-A4006AD75665}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEC14955-8266-498D-8266-A4006AD75665}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEC14955-8266-498D-8266-A4006AD75665}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
