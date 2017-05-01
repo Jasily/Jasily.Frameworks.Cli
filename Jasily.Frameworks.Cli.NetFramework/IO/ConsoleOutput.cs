@@ -13,7 +13,6 @@ namespace Jasily.Frameworks.Cli.IO
             switch (level)
             {
                 case OutputLevel.Normal:
-                    Console.ResetColor();
                     break;
 
                 case OutputLevel.Error:
@@ -33,12 +32,14 @@ namespace Jasily.Frameworks.Cli.IO
         {
             this.SetColor(level);
             Console.Write(value);
+            Console.ResetColor();
         }
 
         public void WriteLine(OutputLevel level, string value)
         {
             this.SetColor(level);
             Console.WriteLine(value);
+            Console.ResetColor();
         }
     }
 }
