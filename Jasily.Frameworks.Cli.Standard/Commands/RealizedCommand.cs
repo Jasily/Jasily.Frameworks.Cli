@@ -64,7 +64,10 @@ namespace Jasily.Frameworks.Cli.Commands
                 throw new TerminationException();
             }
             // wait for task
-            value = serviceProvider.GetValueOrAwaitableResult(value, true);
+            if (value != null)
+            {
+                value = serviceProvider.GetValueOrAwaitableResult(value, true);
+            }
             if (session.Argv.IsAllUsed())
             {
                 return value;
@@ -118,6 +121,7 @@ namespace Jasily.Frameworks.Cli.Commands
                 parser.Parse(args, avs);
                 foreach (var item in avs.Where(z => z.IsSetedValue()))
                 {
+                    item.Verify();
                     oa.AddArgument(item.Parameter.ParameterInfo.Name, item);
                 }
             }
