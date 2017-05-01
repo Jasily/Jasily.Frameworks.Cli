@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
     <metadata>
-        <id>Jasily.Frameworks.Cli.NetFramework</id>
+        <id>Jasily.Frameworks.Cli</id>
         <version>0.0.0.1</version>
-        <title>Jasily.Frameworks.Cli.NetFramework</title>
+        <title>Jasily.Frameworks.Cli</title>
         <authors>Jasily</authors>
         <owners>Jasily</owners>
         <licenseUrl>https://github.com/Jasily/jasily.frameworks.cli-csharp/blob/master/LICENSE</licenseUrl>
@@ -14,11 +14,14 @@
         <copyright>Copyright 2017</copyright>
         <tags>cli console framework</tags>
         <dependencies>
-            <dependency id="Jasily.Frameworks.Cli.Standard" version="0.0.0.1" />
+            <group targetFramework=".NETStandard1.4">
+                <dependency id="Jasily.Frameworks.Cli.Standard" version="0.0.0.1" />
+            </group>
+            <group targetFramework=".NETFramework4.7">
+                <dependency id="Jasily.Frameworks.Cli.NetFramework" version="0.0.0.1" />
+                <dependency id="Jasily.Frameworks.Cli.Standard" version="0.0.0.1" />
+            </group>
         </dependencies>
     </metadata>
-    <files>
-        <file src="bin\Release\Jasily.Frameworks.Cli.NetFramework.xml" target="lib\net47\Jasily.Frameworks.Cli.NetFramework.xml" />
-        <file src="bin\Release\Jasily.Frameworks.Cli.NetFramework.dll" target="lib\net47\Jasily.Frameworks.Cli.NetFramework.dll" />
-    </files>
+    <files />
 </package>
