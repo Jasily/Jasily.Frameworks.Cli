@@ -12,11 +12,11 @@ namespace Jasily.Frameworks.Cli.Tests
             {
                 Assert.AreEqual(1, item.Execute(new string[] {
                     nameof(AsyncCommandClass1.GetCommandClass2),
-                    nameof(CommandClass.Number),
+                    nameof(CommandClass2.Number),
                     "1" }));
                 Assert.AreEqual(455, item.Execute(new string[] {
                     nameof(AsyncCommandClass1.GetCommandClass2),
-                    nameof(CommandClass.Select),
+                    nameof(CommandClass2.Select),
                     "1", "2", "455" }));
             }
         }

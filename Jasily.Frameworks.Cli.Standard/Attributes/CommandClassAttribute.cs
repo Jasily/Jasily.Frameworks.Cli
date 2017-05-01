@@ -4,7 +4,6 @@ using System.Text;
 
 namespace Jasily.Frameworks.Cli.Attributes
 {
-
     /// <summary>
     /// declare the class contains command method.
     /// </summary>

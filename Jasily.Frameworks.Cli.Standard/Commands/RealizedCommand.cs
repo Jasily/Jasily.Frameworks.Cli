@@ -15,26 +15,37 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Jasily.Frameworks.Cli.Commands
 {
-    internal abstract class RealizedCommand : ICommandProperties
+    /// <summary>
+    /// provide api when command build
+    /// </summary>
+    public interface IApiCommandBuilder
+    {
+        /// <summary>
+        /// add name
+        /// </summary>
+        /// <param name="name"></param>
+        void AddName(string name);
+    }
+
+    internal abstract class RealizedCommand : ICommandProperties, IApiCommandBuilder
     {
         private readonly bool ignoreDeclaringName;
         private readonly HashSet<string> namesSet = new HashSet<string>();
         private readonly List<string> names = new List<string>();
+        private bool isFreeze;
 
-        public RealizedCommand(BaseCommandAttribute attr)
+        public RealizedCommand(BaseCommandAttribute attribute)
         {
             this.Names = new ReadOnlyCollection<string>(this.names);
-            if (attr != null)
-            {
-                this.ignoreDeclaringName = attr.IgnoreDeclaringName;
-                if (attr.Names != null)
-                {
-                    foreach (var item in attr.Names)
-                    {
-                        this.names.Add(item ?? throw new ArgumentException());
-                    }
-                }
-            }
+            this.ignoreDeclaringName = attribute?.IgnoreDeclaringName ?? false;
+            attribute?.Apply(this);
+        }
+
+        void IApiCommandBuilder.AddName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("name cannot be empty.", nameof(name));
+            if (this.isFreeze) throw new InvalidOperationException();
+            this.names.Add(name.Trim());
         }
 
         public abstract IReadOnlyList<ParameterInfoDescriptor> Parameters { get; }
