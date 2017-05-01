@@ -25,10 +25,11 @@ namespace Jasily.Frameworks.Cli.Commands
             : base(typeof(T).GetTypeInfo().GetCustomAttribute<CommandClassAttribute>())
         {
             this.serviceProvider = provider;
-            
-            var type = typeof(T);
-            this.DeclaringName = type.Name;
+            this.TypeConfigure = provider.GetRequiredService<TypeConfigure<T>>();
+            this.DeclaringName = typeof(T).Name;
         }
+
+        public TypeConfigure<T> TypeConfigure { get; }
 
         private static ConstructorInfo GetConstructor()
         {
@@ -119,6 +120,32 @@ namespace Jasily.Frameworks.Cli.Commands
         public override OverrideArguments ResolveArguments(IServiceProvider serviceProvider, IArgumentList args)
         {
             throw new NotImplementedException();
+        }
+
+        internal RealizedCommand<T> TryCreateCommand(PropertyInfo property)
+        {
+            var type = typeof(T);
+            // only create public property getter
+            if (!property.CanRead || !property.GetMethod.IsPublic) return null;
+            // only create NOT INDEX property
+            if (property.GetIndexParameters().Length > 0) return null;
+            // inherit property will not create (unless `DeclaringType` contains `CommandClassAttribute` or )
+            if (property.DeclaringType != type)
+            {
+                // unless defined `CommandClassAttribute` or `CommandPropertyAttribute`
+                var declaringType = this.TypeConfigure.GetInheritedTypeConfigure(property.DeclaringType);
+                if (!declaringType.HasCommandClassAttribute &&
+                    !declaringType.GetConfigure(property).HasCommandPropertyAttribute)
+                    return null;
+            }
+
+            var ct = typeof(PropertyCommand<T>);
+            var it = typeof(IMethodInvokerFactory<PropertyCommand<T>>).MakeGenericType(ct);
+            var oa = new OverrideArguments();
+            oa.AddArgument("property", property);
+            var factory = (IMethodInvokerFactory)this.serviceProvider.GetRequiredService(it);
+            var invoker = factory.GetConstructorInvoker(ct.GetTypeInfo().DeclaredConstructors.Single());
+            return (RealizedCommand<T>)invoker.Invoke(this.serviceProvider, oa);
         }
     }
 }

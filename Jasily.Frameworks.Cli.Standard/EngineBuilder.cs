@@ -59,6 +59,9 @@ namespace Jasily.Frameworks.Cli
             var sc = this.Services;
             sc.UseMethodInvoker();
 
+            // internal
+            sc.AddSingleton(typeof(TypeConfigure<>));
+
             // base
             sc.AddSingleton(StringComparer.OrdinalIgnoreCase);
 
@@ -179,11 +182,23 @@ namespace Jasily.Frameworks.Cli
         /// <returns></returns>
         public IEngine Build()
         {
+            return this.Build(out var _);
+        }
+
+        /// <summary>
+        /// use for unittest
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <returns></returns>
+        internal IEngine Build(out IServiceProvider serviceProvider)
+        {
             var sc = this.Services;
-            var comparer = (StringComparer) sc.Last(z => z.ImplementationInstance is StringComparer).ImplementationInstance;
-            var provider = sc.BuildServiceProvider();
+            var comparer = (StringComparer)sc.Last(z => z.ImplementationInstance is StringComparer).ImplementationInstance;
+            var provider = sc.BuildServiceProvider();            
             var engine = (Engine)provider.GetRequiredService<IEngine>();
             var builder = new CommandRouterBuilder(this.types.Select(z => z.GetValue(provider)).ToArray());
+
+            serviceProvider = provider;
             return engine.Initialize(builder.Build(provider));
         }
 

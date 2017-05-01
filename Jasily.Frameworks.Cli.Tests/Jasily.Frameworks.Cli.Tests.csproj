@@ -147,10 +147,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseTest.cs" />
+    <Compile Include="TestArray.cs" />
     <Compile Include="TestAsyncCommandClass1.cs" />
     <Compile Include="TestCommandClass1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestInherit.cs" />
+    <Compile Include="TestInternal\TestCommandConstructor.cs" />
+    <Compile Include="TestInternal\TestConfigure.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
