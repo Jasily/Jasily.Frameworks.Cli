@@ -79,7 +79,8 @@ namespace Jasily.Frameworks.Cli
                 .AddSingleton<IValueConverter<int>, Int32Converter>()
                 .AddSingleton<IValueConverter<long>, Int64Converter>()
                 .AddSingleton<IValueConverter<float>, FloatConverter>()
-                .AddSingleton<IValueConverter<double>, DoubleConverter>();
+                .AddSingleton<IValueConverter<double>, DoubleConverter>()
+                .AddSingleton<IValueConverter<string>, StringConverter>();
             
             // array converters
             sc.AddSingleton(typeof(ArrayConverter<>));

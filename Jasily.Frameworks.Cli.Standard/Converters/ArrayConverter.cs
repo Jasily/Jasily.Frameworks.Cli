@@ -11,6 +11,7 @@ namespace Jasily.Frameworks.Cli.Converters
 
         public ArrayConverter(IValueConverter<T> baseConverter)
         {
+            if (typeof(T) == typeof(string))
             this.baseConverter = baseConverter;
         }
 

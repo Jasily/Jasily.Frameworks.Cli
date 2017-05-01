@@ -30,9 +30,13 @@ namespace Jasily.Frameworks.Cli.Converters
         {
             var typeInfo = type.GetTypeInfo();
 
-            if (type.IsArray)
+            if (type.IsArray && this.serviceProvider.GetService(typeof(IValueConverter<>).MakeGenericType(type.GetElementType())) != null)
             {
-                return typeof(ArrayConverter<>).MakeGenericType(type.GetElementType());
+                var eltype = type.GetElementType();
+                if (this.serviceProvider.GetService(typeof(IValueConverter<>).MakeGenericType(eltype)) != null)
+                {
+                    return typeof(ArrayConverter<>).MakeGenericType(eltype);
+                }
             }
 
             return null;

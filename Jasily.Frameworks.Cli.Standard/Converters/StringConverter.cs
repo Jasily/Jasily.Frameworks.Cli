@@ -30,4 +30,12 @@ namespace Jasily.Frameworks.Cli.Converters
             }
         }
     }
+
+    public class StringConverter : StringConverter<string>
+    {
+        public override string Convert([NotNull] string value)
+        {
+            return value;
+        }
+    }
 }
