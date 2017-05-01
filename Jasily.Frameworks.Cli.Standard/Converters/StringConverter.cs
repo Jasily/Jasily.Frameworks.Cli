@@ -8,11 +8,16 @@ using JetBrains.Annotations;
 
 namespace Jasily.Frameworks.Cli.Converters
 {
-    public abstract class StringConverter<T> : BaseConverter<T>
+    public abstract class StringConverter<T> : IValueConverter<T>
     {
+        public bool CanConvertFrom(object value)
+        {
+            return value is ArgumentValue || value is string;
+        }
+
         public abstract T Convert([NotNull] string value);
 
-        public override T Convert([NotNull] ArgumentValue value)
+        public virtual T Convert([NotNull] ArgumentValue value)
         {
             if (value.Values.Count > 1)
             {
@@ -27,6 +32,21 @@ namespace Jasily.Frameworks.Cli.Converters
             catch (Exception e)
             {
                 throw new ConvertException(value, e.Message, e);
+            }
+        }
+
+        public T Convert(object value)
+        {
+            switch (value)
+            {
+                case ArgumentValue val1:
+                    return Convert(val1);
+
+                case string val1:
+                    return Convert(val1);
+
+                default:
+                    throw new InvalidOperationException();
             }
         }
     }

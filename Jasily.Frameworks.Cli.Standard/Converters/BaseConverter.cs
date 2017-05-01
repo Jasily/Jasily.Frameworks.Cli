@@ -8,12 +8,12 @@ namespace Jasily.Frameworks.Cli.Converters
 {
     public abstract class BaseConverter<T> : IValueConverter<T>
     {
-        public bool CanConvertFrom(object value)
+        public virtual bool CanConvertFrom(object value)
         {
             return value is ArgumentValue;
         }
 
-        public T Convert(object value)
+        public virtual T Convert(object value)
         {
             return this.Convert((ArgumentValue)value);
         }
