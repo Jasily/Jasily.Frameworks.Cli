@@ -62,7 +62,7 @@ namespace Jasily.Frameworks.Cli.Commands
             }
             else
             {
-                throw new UnknownArgumentsException(session, session.Argv.GetUnusedArguments());
+                throw UnknownArgumentsException.Build(session);
             }
         }
 

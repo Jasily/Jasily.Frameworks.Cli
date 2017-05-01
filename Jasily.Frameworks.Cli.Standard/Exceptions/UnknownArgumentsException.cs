@@ -4,17 +4,20 @@ using System.Text;
 
 namespace Jasily.Frameworks.Cli.Exceptions
 {
-    public class UnknownArgumentsException : CliException
+    /// <summary>
+    /// 
+    /// </summary>
+    public sealed class UnknownArgumentsException : ArgumentsException
     {
-        internal UnknownArgumentsException(ISession session, string[] args)
-            : base($"unknown args: ({string.Join(", ", args)})")
+        internal UnknownArgumentsException(string message) : base(message)
         {
-            this.Session = session ?? throw new ArgumentNullException();
-            this.UnknownArguments = args ?? throw new ArgumentNullException();
         }
 
-        public ISession Session { get; }
-
-        public string[] UnknownArguments { get; }
+        internal static UnknownArgumentsException Build(ISession session)
+        {
+            var args = session.Argv.GetUnusedArguments();
+            var msg = $"unknown args: ({string.Join(", ", args)})";
+            return new UnknownArgumentsException(msg);
+        }
     }
 }

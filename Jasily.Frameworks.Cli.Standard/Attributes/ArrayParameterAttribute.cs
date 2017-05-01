@@ -8,8 +8,8 @@ namespace Jasily.Frameworks.Cli.Attributes
     [AttributeUsage(AttributeTargets.Parameter)]
     public sealed class ArrayParameterAttribute : Attribute
     {
-        public int? MinCount { get; set; }
+        public int? MinLength { get; set; }
 
-        public int? MaxCount { get; set; }
+        public int? MaxLength { get; set; }
     }
 }

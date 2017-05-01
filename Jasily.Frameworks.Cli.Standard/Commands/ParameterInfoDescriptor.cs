@@ -55,8 +55,8 @@ namespace Jasily.Frameworks.Cli.Commands
                 if (this.ParameterInfo.GetCustomAttribute<ArrayParameterAttribute>() is
                     ArrayParameterAttribute arrayAttr)
                 {
-                    this.ArrayMinCount = arrayAttr.MinCount;
-                    this.ArrayMaxCount = arrayAttr.MaxCount;
+                    this.ArrayMinLength = arrayAttr.MinLength;
+                    this.ArrayMaxLength = arrayAttr.MaxLength;
                 }
             }
         }
@@ -86,9 +86,9 @@ namespace Jasily.Frameworks.Cli.Commands
 
         public bool IsArray { get; }
 
-        public int? ArrayMinCount { get; }
+        public int? ArrayMinLength { get; }
 
-        public int? ArrayMaxCount { get; }
+        public int? ArrayMaxLength { get; }
 
         #endregion
     }
