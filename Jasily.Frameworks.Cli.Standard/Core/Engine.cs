@@ -56,6 +56,10 @@ namespace Jasily.Frameworks.Cli.Core
                 {
                     this.serviceProvider.GetRequiredService<IOutputer>().WriteLine(OutputLevel.Error, e.Message);
                 }
+                catch (NotImplementedException e)
+                {
+                    this.serviceProvider.GetRequiredService<IOutputer>().WriteLine(OutputLevel.Error, e.ToString());
+                }
             }
 
             return null;
