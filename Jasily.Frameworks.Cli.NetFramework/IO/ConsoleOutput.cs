@@ -20,6 +20,10 @@ namespace Jasily.Frameworks.Cli.IO
                     Console.ForegroundColor = ConsoleColor.Red;
                     break;
 
+                case OutputLevel.Usage:
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    break;
+
                 default:
                     break;
             }
