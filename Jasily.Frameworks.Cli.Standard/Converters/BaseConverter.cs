@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Jasily.DependencyInjection.MethodInvoker;
 using Jasily.Frameworks.Cli.Core;
 
 namespace Jasily.Frameworks.Cli.Converters
 {
-    public abstract class BaseConverter<T>
+    public abstract class BaseConverter<T> : IValueConverter<T>
     {
         public bool CanConvertFrom(object value)
         {

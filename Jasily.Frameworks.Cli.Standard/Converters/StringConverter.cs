@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 
 namespace Jasily.Frameworks.Cli.Converters
 {
-    public abstract class StringConverter<T> : BaseConverter<T>, IValueConverter<T>
+    public abstract class StringConverter<T> : BaseConverter<T>
     {
         public abstract T Convert([NotNull] string value);
 
