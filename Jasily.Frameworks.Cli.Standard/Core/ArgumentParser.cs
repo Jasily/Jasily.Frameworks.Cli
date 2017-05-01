@@ -87,9 +87,12 @@ namespace Jasily.Frameworks.Cli.Core
         {
             if (this.requires.Count > 0)
             {
-                this.arguments.UseOne();
                 var val = this.requires.Peek();
-                val.AddValue(value);
+                if (val.IsAcceptValue())
+                {
+                    val.AddValue(value);
+                    this.arguments.UseOne();
+                }
                 if (!val.IsAcceptValue())
                 {
                     this.requires.Dequeue();
