@@ -78,16 +78,24 @@ namespace Jasily.Frameworks.Cli.Commands
             {
                 return val;
             }
-
             return value;
         }
 
         #region array typed parameter
 
+        /// <summary>
+        /// is parameter accept mulit-value.
+        /// </summary>
         public bool IsArray { get; }
 
+        /// <summary>
+        /// array constraints: min length
+        /// </summary>
         public int? ArrayMinLength { get; }
 
+        /// <summary>
+        /// arrat constraints: max length
+        /// </summary>
         public int? ArrayMaxLength { get; }
 
         #endregion
