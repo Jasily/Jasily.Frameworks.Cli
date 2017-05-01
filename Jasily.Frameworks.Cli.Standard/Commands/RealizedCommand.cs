@@ -17,6 +17,7 @@ namespace Jasily.Frameworks.Cli.Commands
 {
     internal abstract class RealizedCommand : ICommandProperties
     {
+        private readonly bool ignoreDeclaringName;
         private readonly HashSet<string> namesSet = new HashSet<string>();
         private readonly List<string> names = new List<string>();
 
@@ -25,39 +26,30 @@ namespace Jasily.Frameworks.Cli.Commands
             this.Names = new ReadOnlyCollection<string>(this.names);
             if (attr != null)
             {
-                this.IgnoreDeclaringName = attr.IgnoreDeclaringName;
-                this.AddName(attr.Names);
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <exception cref="ArgumentException">throw if any item of names is null.</exception>
-        /// <param name="names"></param>
-        protected void AddName(params string[] names)
-        {
-            if (names == null) return;
-            foreach (var item in names)
-            {
-                if (this.namesSet.Add(item ?? throw new ArgumentException()))
+                this.ignoreDeclaringName = attr.IgnoreDeclaringName;
+                if (attr.Names != null)
                 {
-
+                    foreach (var item in attr.Names)
+                    {
+                        this.names.Add(item ?? throw new ArgumentException());
+                    }
                 }
             }
         }
+
+        public abstract IReadOnlyList<ParameterInfoDescriptor> Parameters { get; }
 
         public IReadOnlyList<string> Names { get; }
 
         public abstract string DeclaringName { get; }
 
-        public bool IgnoreDeclaringName { get; }
+        public bool IgnoreDeclaringName => this.ignoreDeclaringName && this.names.Count > 0;
 
         public virtual object Invoke(IServiceProvider serviceProvider, [NotNull] object instance)
         {
             if (serviceProvider == null) throw new ArgumentNullException(nameof(serviceProvider));
             if (instance == null) throw new ArgumentNullException(nameof(instance));
-
+            
             var session = serviceProvider.GetRequiredService<ISession>();
             var oa = this.ResolveArguments(serviceProvider, session.Argv);
             object value;
@@ -67,7 +59,9 @@ namespace Jasily.Frameworks.Cli.Commands
             }
             catch (ParameterResolveException)
             {
-                throw new NotImplementedException();
+                serviceProvider.GetRequiredService<IUsageDrawer>()
+                    .DrawParameter(this, this.Parameters);
+                throw new TerminationException();
             }
             // wait for task
             value = serviceProvider.GetValueOrAwaitableResult(value, true);
@@ -77,6 +71,7 @@ namespace Jasily.Frameworks.Cli.Commands
             }
             else if (value != null && value.GetType().GetTypeInfo().GetCustomAttribute<CommandClassAttribute>() != null)
             {
+                session.Argv.Grouped();
                 var router = new CommandRouterBuilder(value)
                     .Build(serviceProvider.GetRequiredService<IServiceProvider>());
                 return router.Execute(serviceProvider);
@@ -108,7 +103,7 @@ namespace Jasily.Frameworks.Cli.Commands
 
         public MethodBase Method { get; }
 
-        public IReadOnlyList<ParameterInfoDescriptor> Parameters { get; }
+        public override IReadOnlyList<ParameterInfoDescriptor> Parameters { get; }
 
         public override OverrideArguments ResolveArguments(IServiceProvider serviceProvider, IArgumentList args)
         {

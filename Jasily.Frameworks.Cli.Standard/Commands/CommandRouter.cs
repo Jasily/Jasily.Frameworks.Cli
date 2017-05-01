@@ -3,6 +3,8 @@ using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using JetBrains.Annotations;
+using Jasily.Frameworks.Cli.IO;
+using Jasily.Frameworks.Cli.Exceptions;
 
 namespace Jasily.Frameworks.Cli.Commands
 {
@@ -37,40 +39,45 @@ namespace Jasily.Frameworks.Cli.Commands
             this.CommandsMap = map;
         }
 
-        private bool TryResolve(IArgumentList args, out ICallableCommand command)
-        {
-            switch (this.Commands.Count)
-            {
-                case 0:
-                    throw new NotImplementedException();
-
-                case 1:
-                    command = this.Commands.Single();
-                    return true;
-
-                default:
-                    if (args.TryGetNextArgument(out var name))
-                    {
-                        if (this.CommandsMap.TryGetValue(name, out command))
-                        {
-                            args.UseOne();
-                            return true;
-                        }
-                    }
-                    throw new NotImplementedException();
-            }
-        }
-
         public object Execute(IServiceProvider serviceProvider)
         {
+            bool TryResolve(IArgumentList args, out ICallableCommand command)
+            {
+                switch (this.Commands.Count)
+                {
+                    case 0:
+                        throw new NotImplementedException();
+
+                    case 1:
+                        command = this.Commands.Single();
+                        return true;
+
+                    default:
+                        if (args.TryGetNextArgument(out var name))
+                        {
+                            if (this.CommandsMap.TryGetValue(name, out command))
+                            {
+                                args.UseOne();
+                                return true;
+                            }
+
+                            serviceProvider.GetRequiredService<IOutputer>()
+                                .WriteLine(OutputLevel.Error, $"unknown command <{name}>");
+                        }
+                        command = default(ICallableCommand);
+                        return false;
+                }
+            }
+
             var session = serviceProvider.GetRequiredService<ISession>();            
-            if (this.TryResolve(session.Argv, out var cmd))
+            if (TryResolve(session.Argv, out var cmd))
             {
                 return cmd.Invoke(serviceProvider);
             }
             else
             {
-                throw new NotImplementedException();
+                serviceProvider.GetRequiredService<IUsageDrawer>().DrawRouter(this);
+                throw new TerminationException();
             }
         }
     }

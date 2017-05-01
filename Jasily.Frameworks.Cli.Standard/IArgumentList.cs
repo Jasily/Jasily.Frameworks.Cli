@@ -11,5 +11,9 @@ namespace Jasily.Frameworks.Cli
         int UsedArgvCount { get; }
 
         void Use(int count);
+
+        void Grouped();
+
+        IReadOnlyList<IReadOnlyList<string>> Groups { get; }
     }
 }

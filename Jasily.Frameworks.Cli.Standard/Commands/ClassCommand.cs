@@ -73,6 +73,7 @@ namespace Jasily.Frameworks.Cli.Commands
                     foreach (var method in type.GetRuntimeMethods())
                     {
                         if (!method.IsPublic) continue;
+                        if (method.DeclaringType != type && method.GetCustomAttribute<CommandMethodAttribute>() == null) continue;
 
                         var mt = typeof(MethodCommand<>).MakeGenericType(type);
                         var it = typeof(IMethodInvokerFactory<>).MakeGenericType(mt);
@@ -88,6 +89,8 @@ namespace Jasily.Frameworks.Cli.Commands
                         if (!property.CanRead ||
                             !property.GetMethod.IsPublic ||
                             property.GetIndexParameters().Length > 0) continue;
+
+                        if (property.DeclaringType != type && property.GetCustomAttribute<CommandParameterAttribute>() == null) continue;
 
                         var ct = typeof(PropertyCommand<>).MakeGenericType(type);
                         var it = typeof(IMethodInvokerFactory<>).MakeGenericType(ct);
@@ -105,6 +108,8 @@ namespace Jasily.Frameworks.Cli.Commands
         }
 
         public override string DeclaringName { get; }
+
+        public override IReadOnlyList<ParameterInfoDescriptor> Parameters => throw new NotImplementedException();
 
         public override object Invoke(object instance, IServiceProvider serviceProvider, OverrideArguments args)
         {

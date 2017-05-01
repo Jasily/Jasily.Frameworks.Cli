@@ -6,7 +6,7 @@ namespace Jasily.Frameworks.Cli.Attributes
     public sealed class CommandParameterAttribute : Attribute
     {
         /// <summary>
-        /// name for command.
+        /// name for command parameter.
         /// </summary>
         public string[] Names { get; set; }
 

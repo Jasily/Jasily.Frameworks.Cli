@@ -4,6 +4,8 @@
     {
         Normal,
 
+        Usage,
+
         Error
     }
 }

@@ -48,6 +48,10 @@ namespace Jasily.Frameworks.Cli.Core
                     }
                     return value;
                 }
+                catch (TerminationException)
+                {
+                    // ignore.
+                }
                 catch (ConvertException e)
                 {
                     throw;

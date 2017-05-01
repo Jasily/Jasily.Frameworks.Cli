@@ -72,7 +72,9 @@ namespace Jasily.Frameworks.Cli
             sc.AddScoped(typeof(InstanceContainer<>));
             sc.AddTransient<IOutputer, Outputer>();
 
+            // configureable
             sc.AddTransient<IArgumentParser, ArgumentParser>();
+            sc.AddTransient<IUsageDrawer, UsageDrawer>();
 
             // converters
             sc.AddSingleton<IValueConverter<bool>, BooleanConverter>()
