@@ -17,20 +17,41 @@ namespace Jasily.Frameworks.Cli.Commands
 {
     internal abstract class RealizedCommand : ICommandProperties
     {
-        private readonly HashSet<string> names = new HashSet<string>();
+        private readonly HashSet<string> namesSet = new HashSet<string>();
+        private readonly List<string> names = new List<string>();
 
-        protected void AddName(params string[] names)
+        public RealizedCommand(BaseCommandAttribute attr)
         {
-            if (names != null)
+            this.Names = new ReadOnlyCollection<string>(this.names);
+            if (attr != null)
             {
-                foreach (var item in names) this.names.Add(item);
+                this.IgnoreDeclaringName = attr.IgnoreDeclaringName;
+                this.AddName(attr.Names);
             }
         }
 
-        public virtual IEnumerable<string> EnumerateNames()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <exception cref="ArgumentException">throw if any item of names is null.</exception>
+        /// <param name="names"></param>
+        protected void AddName(params string[] names)
         {
-            return this.names;
+            if (names == null) return;
+            foreach (var item in names)
+            {
+                if (this.namesSet.Add(item ?? throw new ArgumentException()))
+                {
+
+                }
+            }
         }
+
+        public IReadOnlyList<string> Names { get; }
+
+        public abstract string DeclaringName { get; }
+
+        public bool IgnoreDeclaringName { get; }
 
         public virtual object Invoke(IServiceProvider serviceProvider, [NotNull] object instance)
         {
@@ -73,10 +94,10 @@ namespace Jasily.Frameworks.Cli.Commands
 
     internal abstract class RealizedCommand<TClass> : RealizedCommand
     {
-        protected RealizedCommand(IServiceProvider serviceProvider, MethodBase method)
+        protected RealizedCommand(IServiceProvider serviceProvider, MethodBase method, BaseCommandAttribute attr)
+            : base(attr)
         {
             this.Method = method;
-            this.AddName(method.GetCustomAttribute<BaseCommandAttribute>()?.Names);
 
             var comaprer = serviceProvider.GetRequiredService<StringComparer>();
             this.Parameters = method

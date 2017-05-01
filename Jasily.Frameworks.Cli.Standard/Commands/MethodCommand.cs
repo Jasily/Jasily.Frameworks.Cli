@@ -9,15 +9,17 @@ using System.Linq;
 
 namespace Jasily.Frameworks.Cli.Commands
 {
-    internal class MethodCommand<T> : RealizedCommand<T>
+    internal sealed class MethodCommand<T> : RealizedCommand<T>
     {
         private IInstanceMethodInvoker<T> invoker;
 
         public MethodCommand(IServiceProvider serviceProvider, MethodInfo method)
-            : base(serviceProvider, method)
+            : base(serviceProvider, method, method.GetCustomAttribute<CommandMethodAttribute>())
         {
-            this.AddName(method.Name);
+            this.DeclaringName = method.Name;
         }
+
+        public override string DeclaringName { get; }
 
         public override object Invoke(T instance, IServiceProvider serviceProvider, OverrideArguments args)
         {

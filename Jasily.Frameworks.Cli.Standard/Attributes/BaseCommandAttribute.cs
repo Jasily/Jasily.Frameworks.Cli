@@ -8,5 +8,10 @@ namespace Jasily.Frameworks.Cli.Attributes
         /// name for command.
         /// </summary>
         public string[] Names { get; set; }
+
+        /// <summary>
+        /// should router ignore declaring name.
+        /// </summary>
+        public bool IgnoreDeclaringName { get; set; }
     }
 }

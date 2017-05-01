@@ -7,15 +7,15 @@ using Jasily.Frameworks.Cli.Attributes;
 
 namespace Jasily.Frameworks.Cli.Commands
 {
-    internal class PropertyCommand<TClass> : RealizedCommand<TClass>
+    internal sealed class PropertyCommand<TClass> : RealizedCommand<TClass>
     {
         public PropertyCommand(IServiceProvider serviceProvider, PropertyInfo property)
-            : base(serviceProvider, property.GetMethod)
+            : base(serviceProvider, property.GetMethod, property.GetCustomAttribute<CommandPropertyAttribute>())
         {
-            this.AddName(property.Name);
+            this.DeclaringName = property.Name;
         }
 
-        public CommandPropertyAttribute Attribute { get; }
+        public override string DeclaringName { get; }
 
         public override object Invoke(TClass instance, IServiceProvider serviceProvider, OverrideArguments args)
         {

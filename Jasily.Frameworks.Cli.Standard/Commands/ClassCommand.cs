@@ -22,12 +22,12 @@ namespace Jasily.Frameworks.Cli.Commands
         private readonly IServiceProvider serviceProvider;
 
         public ClassCommand(IServiceProvider provider)
+            : base(typeof(T).GetTypeInfo().GetCustomAttribute<CommandClassAttribute>())
         {
             this.serviceProvider = provider;
             
             var type = typeof(T);
-            this.AddName(type.Name);
-            this.AddName(type.GetTypeInfo().GetCustomAttribute<CommandClassAttribute>()?.Names);
+            this.DeclaringName = type.Name;
         }
 
         private static ConstructorInfo GetConstructor()
@@ -103,6 +103,8 @@ namespace Jasily.Frameworks.Cli.Commands
                 return this.subCommands;
             }
         }
+
+        public override string DeclaringName { get; }
 
         public override object Invoke(object instance, IServiceProvider serviceProvider, OverrideArguments args)
         {

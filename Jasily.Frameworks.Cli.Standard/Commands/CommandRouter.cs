@@ -20,7 +20,8 @@ namespace Jasily.Frameworks.Cli.Commands
             var map = new Dictionary<string, ICallableCommand>(comparer);
             foreach (var cmd in commands)
             {
-                foreach (var name in cmd.EnumerateNames())
+                var mapnames = cmd.IgnoreDeclaringName ? cmd.Names : cmd.Names.Concat(new string[] { cmd.DeclaringName });
+                foreach (var name in mapnames)
                 {
                     if (map.TryGetValue(name, out var x) && x != cmd)
                     {

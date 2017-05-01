@@ -7,22 +7,23 @@ namespace Jasily.Frameworks.Cli.Commands
     internal class InstancedCommand : ICallableCommand
     {
         private readonly object instance;
-        private readonly RealizedCommand implCommand;
+        private readonly RealizedCommand innerCommand;
 
-        public InstancedCommand(RealizedCommand implCommand, object instance)
+        public InstancedCommand(RealizedCommand innerCommand, object instance)
         {
-            this.implCommand = implCommand;
+            this.innerCommand = innerCommand;
             this.instance = instance;
         }
 
-        public IEnumerable<string> EnumerateNames()
-        {
-            return this.implCommand.EnumerateNames();
-        }
+        public IReadOnlyList<string> Names => this.innerCommand.Names;
+
+        public string DeclaringName => this.innerCommand.DeclaringName;
+
+        public bool IgnoreDeclaringName => this.innerCommand.IgnoreDeclaringName;
 
         public object Invoke(IServiceProvider serviceProvider)
         {
-            return this.implCommand.Invoke(serviceProvider, this.instance);
+            return this.innerCommand.Invoke(serviceProvider, this.instance);
         }
     }
 }
