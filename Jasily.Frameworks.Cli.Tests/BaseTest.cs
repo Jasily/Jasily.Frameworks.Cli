@@ -33,6 +33,17 @@ namespace Jasily.Frameworks.Cli.Tests
             {
                 return val3;
             }
+
+            public string Usage(
+                int val1,
+                [CommandParameter(IsAutoPadding = true)] IServiceProvider provider,
+                string val2,
+                [CommandParameter(Names = new [] { "valx" })]
+                double val3 = 15,
+                params string[] val4)
+            {
+                throw new InvalidOperationException();
+            }
         }
 
         /// <summary>
