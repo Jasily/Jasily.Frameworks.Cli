@@ -74,6 +74,23 @@ namespace Jasily.Frameworks.Cli.IO
                     sb.Append('[');
                     sb.Append(parameter.ParameterInfo.ParameterType.GetElementType().Name);
                     sb.Append(", ...]");
+
+                    void AppendIfRangeValid(string value)
+                    {
+                        if (parameter.ArrayMinLength > 0 || parameter.ArrayMinLength > 0) sb.Append(value);
+                    }
+
+                    AppendIfRangeValid(" require(");
+                    if (parameter.ArrayMinLength > 0)
+                    {
+                        sb.Append(parameter.ArrayMinLength.ToString()).Append("<");
+                    }
+                    AppendIfRangeValid("COUNT");
+                    if (parameter.ArrayMaxLength > 0)
+                    {
+                        sb.Append("<").Append(parameter.ArrayMaxLength.ToString());
+                    }
+                    AppendIfRangeValid(")");
                 }
                 else
                 {

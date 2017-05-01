@@ -49,20 +49,44 @@ namespace Jasily.Frameworks.Cli.Commands
         {
             if (serviceProvider == null) throw new ArgumentNullException(nameof(serviceProvider));
             if (instance == null) throw new ArgumentNullException(nameof(instance));
-            
             var session = serviceProvider.GetRequiredService<ISession>();
-            var oa = this.ResolveArguments(serviceProvider, session.Argv);
-            object value;
-            try
-            {
-                value = this.Invoke(instance, serviceProvider, oa);
-            }
-            catch (ParameterResolveException)
+
+            void DrawUsage()
             {
                 serviceProvider.GetRequiredService<IUsageDrawer>()
                     .DrawParameter(this, this.Parameters);
                 throw new TerminationException();
             }
+
+            OverrideArguments GetArguments()
+            {
+                try
+                {
+                    return this.ResolveArguments(serviceProvider, session.Argv);
+                }
+                catch (ArgumentsException e)
+                {
+                    serviceProvider.GetRequiredService<IOutputer>().WriteLine(OutputLevel.Error, e.Message);
+                    DrawUsage();
+                    throw;
+                }
+            }
+            var oa = GetArguments();
+
+            object InternalInvoke()
+            {
+                try
+                {
+                    return this.Invoke(instance, serviceProvider, oa);
+                }
+                catch (ParameterResolveException)
+                {
+                    DrawUsage();
+                    throw;
+                }
+            }
+            var value  = InternalInvoke();
+
             // wait for task
             if (value != null)
             {

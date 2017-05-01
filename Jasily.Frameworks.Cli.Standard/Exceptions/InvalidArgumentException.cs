@@ -16,10 +16,9 @@ namespace Jasily.Frameworks.Cli.Exceptions
         internal static InvalidArgumentException Build(ArgumentValue value, string require)
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"invalid value in parameter <{value.Parameter.ParameterInfo.Name}>:");
-            sb.AppendLine("require:");
-            sb.AppendLine(require);
-            return new InvalidArgumentException(require);
+            sb.Append($"invalid value for parameter <{value.Parameter.ParameterInfo.Name}>: require  ");
+            sb.Append(require);
+            return new InvalidArgumentException(sb.ToString());
         }
     }
 }
