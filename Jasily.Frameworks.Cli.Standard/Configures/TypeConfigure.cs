@@ -5,7 +5,7 @@ using Jasily.Frameworks.Cli.Attributes;
 using System.Collections.Concurrent;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Jasily.Frameworks.Cli.Commands
+namespace Jasily.Frameworks.Cli.Configures
 {
     internal class TypeConfigure<TClass> : ITypeConfigure
     {

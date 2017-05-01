@@ -11,6 +11,7 @@ using Jasily.Frameworks.Cli.Attributes;
 using Jasily.Frameworks.Cli.Commands;
 using JetBrains.Annotations;
 using System.Collections.Generic;
+using Jasily.Frameworks.Cli.Configures;
 
 namespace Jasily.Frameworks.Cli
 {

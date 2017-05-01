@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace Jasily.Frameworks.Cli.Commands
+namespace Jasily.Frameworks.Cli.Configures
 {
     internal interface ITypeConfigure
     {

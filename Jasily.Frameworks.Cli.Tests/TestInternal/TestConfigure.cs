@@ -3,6 +3,7 @@ using Jasily.Frameworks.Cli.Attributes;
 using Microsoft.Extensions.DependencyInjection;
 using Jasily.Frameworks.Cli.Commands;
 using System.Collections.Generic;
+using Jasily.Frameworks.Cli.Configures;
 
 namespace Jasily.Frameworks.Cli.Tests.TestInternal
 {

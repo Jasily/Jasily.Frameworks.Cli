@@ -8,6 +8,7 @@ using Jasily.Frameworks.Cli.Attributes;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
 using Jasily.Frameworks.Cli.Exceptions;
+using Jasily.Frameworks.Cli.Configures;
 
 namespace Jasily.Frameworks.Cli.Commands
 {
