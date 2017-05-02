@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>Jasily.Frameworks.Cli.NetFramework</id>
-        <version>0.0.0.4</version>
+        <version>0.0.1.0</version>
         <title>Jasily.Frameworks.Cli.NetFramework</title>
         <authors>Jasily</authors>
         <owners>Jasily</owners>
@@ -14,7 +14,7 @@
         <copyright>Copyright 2017</copyright>
         <tags>cli console framework</tags>
         <dependencies>
-            <dependency id="Jasily.Frameworks.Cli.Standard" version="0.0.0.9" />
+            <dependency id="Jasily.Frameworks.Cli.Standard" version="0.0.1.1" />
         </dependencies>
     </metadata>
     <files>
