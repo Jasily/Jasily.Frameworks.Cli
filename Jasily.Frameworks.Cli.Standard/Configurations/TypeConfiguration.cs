@@ -1,22 +1,28 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
+using System.Text;
+using System.Threading;
 using Jasily.DependencyInjection.MethodInvoker;
 using Jasily.Frameworks.Cli.Attributes;
 using Jasily.Frameworks.Cli.Commands;
+using Jasily.Frameworks.Cli.Converters;
+using Jasily.Frameworks.Cli.Core;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Jasily.Frameworks.Cli.Configurations
 {
-    internal class TypeConfiguration<TClass> : ITypeConfiguration
+    internal class TypeConfiguration<TClass> : BaseConfiguration, ITypeConfiguration
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly Dictionary<Type, ITypeConfiguration> _inheritedsConfigures = new Dictionary<Type, ITypeConfiguration>();
         private readonly Dictionary<PropertyInfo, IPropertyConfiguration> _propertiesConfigurations;
         private readonly Dictionary<MethodInfo, IMethodConfiguration> _methodsConfigurations;
+        private IReadOnlyList<ICommand> _availableCommands;
 
         public TypeConfiguration(IServiceProvider serviceProvider)
         {
@@ -26,18 +32,9 @@ namespace Jasily.Frameworks.Cli.Configurations
             // load attributes
             this.TypeInfo = this.Type.GetTypeInfo();
 
-            var n = new NameConfigurator();
-            foreach (var attrubute in this.TypeInfo.GetCustomAttributes())
-            {
-                if (attrubute is CommandClassAttribute)
-                {
-                    this.IsDefinedCommand = true;
-                }
-
-                (attrubute as IConfigureableAttribute<INameConfigurator>)?.Apply(n);
-            }
-            this.Names = n.BuildName(this.Type.Name);
-            
+            var attributes = this.TypeInfo.GetCustomAttributes().ToArray();
+            this.Names = CreateNameList(attributes, this.Type.Name);
+            this.IsDefinedCommand = attributes.OfType<CommandClassAttribute>().FirstOrDefault() != null;
 
             // load inherited class
             var t = typeof(TClass);
@@ -55,16 +52,6 @@ namespace Jasily.Frameworks.Cli.Configurations
             this._methodsConfigurations = typeof(TClass).GetRuntimeMethods()
                 .Select(this.BuildConfiguration)
                 .ToDictionary(z => z.Method);
-
-            // load sub commands
-            var cmds = new List<ICommand>();
-            cmds.AddRange(this._propertiesConfigurations
-                .Select(z=> z.Value.TryMakeCommand(typeof(TClass)))
-                .Where(z => z != null));
-            cmds.AddRange(this._methodsConfigurations
-                .Select(z => z.Value.TryMakeCommand(typeof(TClass)))
-                .Where(z => z != null));
-            this.AvailableCommands = cmds.AsReadOnly();
         }
 
         public Type Type { get; } = typeof(TClass);
@@ -89,7 +76,24 @@ namespace Jasily.Frameworks.Cli.Configurations
             throw new InvalidOperationException();
         }
 
-        public IReadOnlyList<ICommand> AvailableCommands { get; }
+        public IReadOnlyList<ICommand> AvailableCommands
+        {
+            get
+            {
+                if (this._availableCommands == null)
+                {
+                    var cmds = new List<ICommand>();
+                    cmds.AddRange(this._propertiesConfigurations
+                        .Select(z => z.Value.TryMakeCommand(typeof(TClass)))
+                        .Where(z => z != null));
+                    cmds.AddRange(this._methodsConfigurations
+                        .Select(z => z.Value.TryMakeCommand(typeof(TClass)))
+                        .Where(z => z != null));
+                    Interlocked.CompareExchange(ref this._availableCommands, cmds.AsReadOnly(), null);
+                }
+                return this._availableCommands;
+            }
+        }
 
         #endregion
 
@@ -103,24 +107,16 @@ namespace Jasily.Frameworks.Cli.Configurations
             return new MethodConfiguration(this, method);
         }
 
-        internal class PropertyConfiguration : IPropertyConfiguration
+        internal class PropertyConfiguration : BaseConfiguration, IPropertyConfiguration
         {
             public PropertyConfiguration(TypeConfiguration<TClass> typeConfiguration, PropertyInfo property)
             {
                 this.ServiceProvider = typeConfiguration._serviceProvider;
                 this.Property = property ?? throw new ArgumentNullException(nameof(property));
 
-                var n = new NameConfigurator();
-                foreach (var attrubute in property.GetCustomAttributes())
-                {
-                    if (attrubute is CommandPropertyAttribute)
-                    {
-                        this.IsDefinedCommand = true;
-                    }
-
-                    (attrubute as IConfigureableAttribute<INameConfigurator>)?.Apply(n);
-                }
-                this.Names = n.BuildName(property.Name);
+                var attributes = property.GetCustomAttributes().ToArray();
+                this.Names = CreateNameList(attributes, property.Name);
+                this.IsDefinedCommand = attributes.OfType<CommandPropertyAttribute>().FirstOrDefault() != null;
             }
 
             public IServiceProvider ServiceProvider { get; }
@@ -149,24 +145,18 @@ namespace Jasily.Frameworks.Cli.Configurations
             }
         }
 
-        internal class MethodConfiguration : IMethodConfiguration
+        internal class MethodConfiguration : BaseConfiguration, IMethodConfiguration
         {
+            private IReadOnlyList<ParameterConfiguration> _parameterConfigurations;
+
             public MethodConfiguration(TypeConfiguration<TClass> typeConfiguration, MethodInfo method)
             {
                 this.ServiceProvider = typeConfiguration._serviceProvider;
                 this.Method = method ?? throw new ArgumentNullException(nameof(method));
 
-                var n = new NameConfigurator();
-                foreach (var attrubute in method.GetCustomAttributes())
-                {
-                    if (attrubute is CommandMethodAttribute)
-                    {
-                        this.IsDefinedCommand = true;
-                    }
-
-                    (attrubute as IConfigureableAttribute<INameConfigurator>)?.Apply(n);
-                }
-                this.Names = n.BuildName(method.Name);
+                var attributes = method.GetCustomAttributes().ToArray();
+                this.Names = CreateNameList(attributes, method.Name);
+                this.IsDefinedCommand = attributes.OfType<CommandMethodAttribute>().FirstOrDefault() != null;
             }
 
             public IServiceProvider ServiceProvider { get; }
@@ -191,6 +181,162 @@ namespace Jasily.Frameworks.Cli.Configurations
                 }
                 
                 return new MethodCommand<TClass>(this);
+            }
+
+            public IReadOnlyList<IParameterConfiguration> ParameterConfigurations
+            {
+                get
+                {
+                    if (this._parameterConfigurations == null)
+                    {
+                        var comaprer = this.ServiceProvider.GetRequiredService<StringComparer>();
+                        var conflictNameMap = new Dictionary<string, ParameterInfo>(comaprer);
+                        var parameters = this.Method.GetParameters()
+                            .Select(z => new ParameterConfiguration(this, z, conflictNameMap, comaprer))
+                            .ToArray()
+                            .AsReadOnly();
+                        Interlocked.CompareExchange(ref this._parameterConfigurations, parameters, null);
+                    }
+
+                    return this._parameterConfigurations;
+                }
+            }
+        }
+
+        internal class ParameterConfiguration : BaseConfiguration, IParameterConfiguration
+        {
+            private readonly HashSet<string> _nameSet;
+
+            internal ParameterConfiguration(MethodConfiguration method, ParameterInfo parameter,
+                Dictionary<string, ParameterInfo> conflictNameMap, StringComparer comaprer)
+            {
+                this.ParameterInfo = parameter;
+                this.IsOptional = parameter.HasDefaultValue;
+                this.IsResolveByEngine = method.ServiceProvider.GetRequiredService<AutoResolvedTypes>()
+                    .Contains(parameter.ParameterType);
+
+                var attributes = parameter.GetCustomAttributes().ToArray();
+                this.Names = CreateNameList(attributes, parameter.Name);
+                this._nameSet = new HashSet<string>(this.Names);
+                foreach (var name in this._nameSet)
+                {
+                    if (conflictNameMap.TryGetValue(name, out var p))
+                    {
+                        var msg = new StringBuilder()
+                            .AppendLine($"Parameter Definition Error on {typeof(TClass).Name}.{method.Method.Name}:")
+                            .AppendLine($"   Name <{name}> is Conflict with Another Parameter <{p.Name}>.");
+                        throw new InvalidOperationException(msg.ToString());
+                    }
+                    conflictNameMap.Add(name, parameter);
+                }
+
+                IValueConverter GetValueConverter(Type type)
+                {
+                    var converter = method.ServiceProvider.GetService(typeof(Converters.IValueConverter<>).FastMakeGenericType(type));
+                    if (converter == null)
+                    {
+                        var msg = $"convert string {this.ParameterInfo.ParameterType.Name} is not supported.";
+                        throw new InvalidOperationException(msg);
+                    }
+                    return (IValueConverter)converter;
+                }
+
+                if (this.ParameterInfo.ParameterType.IsArray)
+                {
+                    this.IsArray = true;
+                    this.ArrayElementType = this.ParameterInfo.ParameterType.GetElementType();
+
+                    var configurator = new ArrayParameterConfigurator();
+                    attributes.OfType<IConfigureableAttribute<IArrayParameterConfigurator>>()
+                        .ForEach(z => z.Apply(configurator));
+                    this.ArrayMinLength = configurator.MinLength;
+                    this.ArrayMaxLength = configurator.MaxLength;
+
+                    this.ValueConverter = GetValueConverter(this.ArrayElementType);
+                }
+                else
+                {
+                    if (!this.IsResolveByEngine)
+                    {
+                        this.ValueConverter = GetValueConverter(this.ParameterInfo.ParameterType);
+                    }
+
+                    if (this.ParameterInfo.ParameterType == typeof(bool))
+                    {
+                        var configurator = new BooleanParameterConfigurator(comaprer);
+                        attributes.OfType<IConfigureableAttribute<IBooleanParameterConfigurator>>()
+                            .ForEach(z => z.Apply(configurator));
+                        var boolMap = configurator.CreateMap();
+
+                        if (this.ValueConverter != null)
+                        {
+                            this.ValueConverter = new MapedValueConverter(boolMap, this.ValueConverter);
+                        }
+                    }
+                }
+            }
+
+            public ParameterInfo ParameterInfo { get; }
+
+            public IValueConverter ValueConverter { get; }
+
+            public IReadOnlyList<string> Names { get; }
+
+            public bool IsResolveByEngine { get; }
+
+            public bool IsMatchName(string name)
+            {
+                return this._nameSet.Contains(name);
+            }
+
+            #region array typed parameter
+
+            /// <summary>
+            /// is parameter accept mulit-value.
+            /// </summary>
+            public bool IsArray { get; }
+
+            /// <summary>
+            /// array constraints: min length
+            /// </summary>
+            public int ArrayMinLength { get; }
+
+            /// <summary>
+            /// arrat constraints: max length
+            /// </summary>
+            public int ArrayMaxLength { get; }
+
+            public Type ArrayElementType { get; }
+
+            #endregion
+
+            public bool IsOptional { get; }
+
+            private class MapedValueConverter : IValueConverter
+            {
+                private readonly IValueConverter _baseValueConverter;
+                private readonly IReadOnlyDictionary<string, string> _map;
+
+                public MapedValueConverter(IReadOnlyDictionary<string, string> map, IValueConverter baseValueConverter)
+                {
+                    this._map = map;
+                    this._baseValueConverter = baseValueConverter;
+                }
+
+                public object Convert(IEnumerable<string> values)
+                {
+                    return this._baseValueConverter.Convert(values.Select(this.Select));
+                }
+
+                private string Select(string value)
+                {
+                    return this._map.TryGetValue(value, out var r) ? r : value;
+                }
+
+                public object Convert(string value)
+                {
+                    return this._baseValueConverter.Convert(this.Select(value));
+                }
             }
         }
     }

@@ -13,7 +13,7 @@ namespace Jasily.Frameworks.Cli.Core
 
         private ArgumentValue TryGetByName(string name)
         {
-            return this.valueList.SingleOrDefault(z => z.Parameter.IsMatchName(name));
+            return this.valueList.SingleOrDefault(z => z.IsMatch(name));
         }
 
         private string Value(string value)
@@ -130,7 +130,7 @@ namespace Jasily.Frameworks.Cli.Core
             // set var
             this.arguments = args;
             this.valueList = values;
-            this.requires = new Queue<ArgumentValue>(values.Where(z => !z.Parameter.ParameterInfo.HasDefaultValue));
+            this.requires = new Queue<ArgumentValue>(values.Where(z => !z.ParameterProperties.IsOptional));
 
             // start
             this.ParseCore();

@@ -1,23 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.IO;
+using System.Linq;
 using Jasily.DependencyInjection.MethodInvoker;
+using Jasily.Frameworks.Cli.Exceptions;
 using Jasily.Frameworks.Cli.Core;
+using JetBrains.Annotations;
 
 namespace Jasily.Frameworks.Cli.Converters
 {
     public abstract class BaseConverter<T> : IValueConverter<T>
     {
-        public virtual bool CanConvertFrom(object value)
+        public object Convert([NotNull] IEnumerable<string> values)
         {
-            return value is ArgumentValue;
+            if (values == null) throw new ArgumentNullException(nameof(values));
+            return values.Select(this.Convert).ToArray();
         }
 
-        public virtual T Convert(object value)
+        object IValueConverter.Convert(string value)
         {
-            return this.Convert((ArgumentValue)value);
+            try
+            {
+                return this.Convert(value);
+            }
+            catch (ConvertException)
+            {
+                throw;
+            }
+            catch (Exception)
+            {
+                throw new ConvertException($"connot convert value <{value}> to type <{typeof(T).Name}>");
+            }
         }
 
-        public abstract T Convert(ArgumentValue value);
+        protected abstract T Convert([NotNull] string value);
     }
 }

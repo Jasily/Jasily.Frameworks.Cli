@@ -1,4 +1,6 @@
-﻿namespace Jasily.Frameworks.Cli
+﻿using Jasily.Frameworks.Cli.Core;
+
+namespace Jasily.Frameworks.Cli
 {
     /// <summary>
     /// cli engine interface.
@@ -6,9 +8,10 @@
     public interface IEngine
     {
         /// <summary>
-        /// execute in scope session.
+        /// fire the <paramref name="instance"/>.
         /// </summary>
-        /// <param name="argv"></param>
-        object Execute(string[] argv);
+        /// <param name="instance"></param>
+        /// <returns></returns>
+        Executor Fire(object instance);
     }
 }

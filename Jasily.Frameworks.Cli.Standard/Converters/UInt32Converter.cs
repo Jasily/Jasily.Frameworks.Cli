@@ -1,6 +1,6 @@
 ﻿namespace Jasily.Frameworks.Cli.Converters
 {
-    internal class UInt32Converter : StringConverter<uint>
+    internal class UInt32Converter : BaseConverter<uint>
     {
         protected override uint Convert(string value)
         {

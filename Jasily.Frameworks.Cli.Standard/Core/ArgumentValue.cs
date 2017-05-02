@@ -1,41 +1,48 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Jasily.Frameworks.Cli.Commands;
+using Jasily.Frameworks.Cli.Configurations;
 using Jasily.Frameworks.Cli.Exceptions;
 
 namespace Jasily.Frameworks.Cli.Core
 {
     public class ArgumentValue
     {
+        private readonly IParameterConfiguration _parameterConfiguration;
         private readonly List<string> _values = new List<string>();
 
-        internal ArgumentValue(ParameterInfoDescriptor parameter)
+        internal ArgumentValue(IParameterConfiguration parameterConfiguration)
         {
-            this.Parameter = parameter;
+            this._parameterConfiguration = parameterConfiguration;
             this.Values = new ReadOnlyCollection<string>(this._values);
+            this.ParameterName = this._parameterConfiguration.ParameterInfo.Name;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public ParameterInfoDescriptor Parameter { get; }
+        public string ParameterName { get; }
 
         public IReadOnlyList<string> Values { get; }
 
+        public IParameterProperties ParameterProperties => this._parameterConfiguration;
+
+        public bool IsMatch(string name)
+        {
+            return this._parameterConfiguration.IsMatchName(name);
+        }
+
         public void AddValue(string value)
         {
-            value = this.Parameter.ConvertValueInternal(value);
             this._values.Add(value);
         }
 
         public bool IsSetedValue()
         {
-            return this.Parameter.IsArray || this._values.Count > 0;
+            return this._parameterConfiguration.IsArray || this._values.Count > 0;
         }
 
         public bool IsAcceptValue()
         {
-            return this.Parameter.IsArray || this._values.Count == 0;
+            return this._parameterConfiguration.IsArray || this._values.Count == 0;
         }
 
         /// <summary>
@@ -43,26 +50,35 @@ namespace Jasily.Frameworks.Cli.Core
         /// </summary>
         internal void Verify()
         {
-            if (this.Parameter.IsArray)
+            if (this._parameterConfiguration.IsArray)
             {
-                if (this.Parameter.ArrayMinLength > 0)
+                if (this._parameterConfiguration.ArrayMinLength > 0)
                 {
-                    if (this.Parameter.ArrayMinLength > this.Values.Count)
+                    if (this._parameterConfiguration.ArrayMinLength > this.Values.Count)
                     {
-                        var msg = $"count >= {this.Parameter.ArrayMinLength}";
-                        throw InvalidArgumentException.Build(this, msg);
+                        throw InvalidArgumentException.Build(this, $"count >= {this.ParameterProperties.ArrayMinLength}");
                     }
                 }
 
-                if (this.Parameter.ArrayMaxLength > 0)
+                if (this._parameterConfiguration.ArrayMaxLength > 0)
                 {
-                    if (this.Parameter.ArrayMaxLength < this.Values.Count)
+                    if (this._parameterConfiguration.ArrayMaxLength < this.Values.Count)
                     {
-                        var msg = $"count <= {this.Parameter.ArrayMaxLength}";
-                        throw InvalidArgumentException.Build(this, msg);
+                        throw InvalidArgumentException.Build(this, $"count <= {this.ParameterProperties.ArrayMaxLength}");
                     }
                 }
             }
+            else if (this.Values.Count > 1)
+            {
+                throw new ConvertException("too many arguments.");
+            }
+        }
+
+        internal object GetValue()
+        {
+            return this._parameterConfiguration.IsArray
+                ? this._parameterConfiguration.ValueConverter.Convert(this.Values)
+                : this._parameterConfiguration.ValueConverter.Convert(this.Values.Single());
         }
     }
 }

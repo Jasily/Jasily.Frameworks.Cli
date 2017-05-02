@@ -1,6 +1,6 @@
 ﻿namespace Jasily.Frameworks.Cli.Converters
 {
-    internal class BooleanConverter : StringConverter<bool>
+    internal class BooleanConverter : BaseConverter<bool>
     {
         protected override bool Convert(string value)
         {

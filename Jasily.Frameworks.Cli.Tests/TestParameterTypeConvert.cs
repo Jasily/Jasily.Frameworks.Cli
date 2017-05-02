@@ -1,4 +1,5 @@
 ﻿using System;
+using Jasily.Frameworks.Cli.Attributes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Jasily.Frameworks.Cli.Tests
@@ -46,7 +47,7 @@ namespace Jasily.Frameworks.Cli.Tests
         [TestMethod]
         public void TypeShouldConvertCorrect()
         {
-            var engine = this.Build(new CommandClass(), out var sb);
+            var engine = this.Fire(new CommandClass(), out var sb);
             Assert.AreEqual(5, engine.Execute(new[] { nameof(CommandClass.Int32), "5" }));
             Assert.AreEqual((uint)5, engine.Execute(new[] { nameof(CommandClass.UInt32), "5" }));
             Assert.AreEqual((long)5, engine.Execute(new[] { nameof(CommandClass.Int64), "5" }));
@@ -58,13 +59,33 @@ namespace Jasily.Frameworks.Cli.Tests
         [TestMethod]
         public void TypeConvertWrong()
         {
-            var engine = this.Build(new CommandClass(), out var sb);
+            var engine = this.Fire(new CommandClass(), out var sb);
             Assert.AreEqual(null, engine.Execute(new[] { nameof(CommandClass.Int32), "5.2" }));
             //Assert.AreEqual((uint)5, engine.Execute(new[] { nameof(CommandClass.UInt32), "5" }));
             //Assert.AreEqual((long)5, engine.Execute(new[] { nameof(CommandClass.Int64), "5" }));
             //Assert.AreEqual((ulong)5, engine.Execute(new[] { nameof(CommandClass.UInt64), "5" }));
             //Assert.AreEqual((float)5, engine.Execute(new[] { nameof(CommandClass.Single), "5" }));
             //Assert.AreEqual((double)5, engine.Execute(new[] { nameof(CommandClass.Double), "5" }));
+        }
+
+        public class BooleanParamerterCommandClass
+        {
+            public bool WithOutAttribute(bool value) => value;
+
+            public bool WithAttribute([BoolParameter(true, "x"), BoolParameter(false, "y")] bool value) => value;
+        }
+
+        [TestMethod]
+        public void BooleanTypedParamerterConvertCorrect()
+        {
+            var engine = this.Fire(new BooleanParamerterCommandClass(), out var _);
+
+            Assert.AreEqual(true, engine.Execute(new[] { nameof(BooleanParamerterCommandClass.WithOutAttribute), "true" }));
+            Assert.AreEqual(false, engine.Execute(new[] { nameof(BooleanParamerterCommandClass.WithOutAttribute), "false" }));
+            Assert.AreEqual(null, engine.Execute(new[] { nameof(BooleanParamerterCommandClass.WithOutAttribute), "x" }));
+            Assert.AreEqual(null, engine.Execute(new[] { nameof(BooleanParamerterCommandClass.WithOutAttribute), "y" }));
+            Assert.AreEqual(true, engine.Execute(new[] { nameof(BooleanParamerterCommandClass.WithAttribute), "x" }));
+            Assert.AreEqual(false, engine.Execute(new[] { nameof(BooleanParamerterCommandClass.WithAttribute), "y" }));
         }
     }
 }

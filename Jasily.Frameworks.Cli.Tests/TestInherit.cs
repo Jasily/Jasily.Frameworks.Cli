@@ -27,19 +27,19 @@ namespace Jasily.Frameworks.Cli.Tests
         [TestMethod]
         public void TestMethodNotInherit()
         {
-            foreach (var item in this.Build<Class1>())
+            foreach (var item in this.Fire<Class1>())
             {
-                Assert.AreEqual(1, item.Execute(new string[] { nameof(Class1.Value) }));
+                Assert.AreEqual(1, item.Execute(new[] { nameof(Class1.Value) }));
             }
 
-            foreach (var item in this.Build<Class2>())
+            foreach (var item in this.Fire<Class2>())
             {
-                Assert.AreEqual(null, item.Execute(new string[] { nameof(Class2.Value) }));
+                Assert.AreEqual(null, item.Execute(new[] { nameof(Class2.Value) }));
             }
 
-            foreach (var item in this.Build<Class3>())
+            foreach (var item in this.Fire<Class3>())
             {
-                Assert.AreEqual(3, item.Execute(new string[] { nameof(Class3.Value) }));
+                Assert.AreEqual(3, item.Execute(new[] { nameof(Class3.Value) }));
             }
         }
 
@@ -59,12 +59,12 @@ namespace Jasily.Frameworks.Cli.Tests
         [TestMethod]
         public void TestMethodInheritOnlyContainsAttribute()
         {
-            foreach (var item in this.Build<Class4>())
+            foreach (var item in this.Fire<Class4>())
             {
                 Assert.AreEqual(1, item.Execute(new[] { nameof(Class4.Value) }));
             }
 
-            foreach (var item in this.Build<Class5>())
+            foreach (var item in this.Fire<Class5>())
             {
                 Assert.AreEqual(1, item.Execute(new[] { nameof(Class5.Value) }));
             }

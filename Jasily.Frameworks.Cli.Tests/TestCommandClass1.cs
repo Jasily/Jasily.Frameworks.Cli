@@ -9,9 +9,8 @@ namespace Jasily.Frameworks.Cli.Tests
     {
         public class CommandClass
         {
-            public int Number([CommandParameter(IsAutoPadding = true)] IServiceProvider provider, int value)
+            public int Number(int value)
             {
-                if (provider == null) throw new ArgumentNullException();
                 return value;
             }
 
@@ -22,7 +21,6 @@ namespace Jasily.Frameworks.Cli.Tests
 
             public string Usage(
                 int val1,
-                [CommandParameter(IsAutoPadding = true)] IServiceProvider provider,
                 string val2,
                 [CommandParameter(Names = new [] { "valx" })]
                 double val3 = 15,
@@ -35,7 +33,7 @@ namespace Jasily.Frameworks.Cli.Tests
         [TestMethod]
         public void Test()
         {
-            foreach (var item in this.Build<CommandClass>())
+            foreach (var item in this.Fire<CommandClass>())
             {
                 Assert.AreEqual(1, item.Execute(new[] {
                     nameof(CommandClass.Number),

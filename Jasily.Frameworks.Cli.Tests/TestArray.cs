@@ -20,10 +20,10 @@ namespace Jasily.Frameworks.Cli.Tests
         [TestMethod]
         public void Test()
         {
-            foreach (var item in this.Build<TestClassParamsArray>())
+            foreach (var item in this.Fire<TestClassParamsArray>())
             {
-                Assert.AreEqual(null, item.Execute(new string[] { nameof(TestClassParamsArray.Func), "1" }));
-                Assert.AreEqual(null, item.Execute(new string[] { nameof(TestClassParamsArray.Func)}));
+                Assert.AreEqual(null, item.Execute(new[] { nameof(TestClassParamsArray.Func), "1" }));
+                Assert.AreEqual(null, item.Execute(new[] { nameof(TestClassParamsArray.Func)}));
             }
         }
     }

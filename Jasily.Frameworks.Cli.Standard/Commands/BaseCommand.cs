@@ -19,21 +19,15 @@ namespace Jasily.Frameworks.Cli.Commands
 {
     internal abstract class BaseCommand : ICommand
     {
-        protected BaseCommand(IServiceProvider serviceProvider, MethodBase method, ICommandProperties properties)
+        protected BaseCommand(MethodBase method, ICommandProperties properties)
         {
             this.Method = method;
             this.Properties = properties;
-
-            var comaprer = serviceProvider.GetRequiredService<StringComparer>();
-            this.Parameters = method
-                .GetParameters()
-                .Select(z => new ParameterInfoDescriptor(z, comaprer))
-                .ToArray();
         }
 
         public MethodBase Method { get; }
 
-        public IReadOnlyList<ParameterInfoDescriptor> Parameters { get; }
+        public abstract IReadOnlyList<IParameterConfiguration> ParameterConfigurations { get; }
 
         public object Invoke(IServiceProvider serviceProvider, [NotNull] object instance)
         {
@@ -102,10 +96,10 @@ namespace Jasily.Frameworks.Cli.Commands
         public OverrideArguments ResolveArguments(IServiceProvider serviceProvider, IArgumentList args)
         {
             var oa = new OverrideArguments();
-            if (this.Parameters.Count > 0)
+            if (this.ParameterConfigurations.Count > 0)
             {
                 var avs = new ReadOnlyCollection<ArgumentValue>(
-                    this.Parameters.Where(z => !z.IsAutoPadding)
+                    this.ParameterConfigurations.Where(z => !z.IsResolveByEngine)
                         .Select(z => new ArgumentValue(z)).ToArray()
                 );
                 var parser = serviceProvider.GetRequiredService<IArgumentParser>();
@@ -113,7 +107,7 @@ namespace Jasily.Frameworks.Cli.Commands
                 foreach (var item in avs.Where(z => z.IsSetedValue()))
                 {
                     item.Verify();
-                    oa.AddArgument(item.Parameter.ParameterInfo.Name, item);
+                    oa.AddArgument(item.ParameterName, item.GetValue());
                 }
             }
             return oa;

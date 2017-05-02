@@ -3,7 +3,7 @@ using Jasily.Frameworks.Cli.Exceptions;
 
 namespace Jasily.Frameworks.Cli.Converters
 {
-    internal class DirectoryInfoConverter : StringConverter<DirectoryInfo>
+    internal class DirectoryInfoConverter : BaseConverter<DirectoryInfo>
     {
         protected override DirectoryInfo Convert(string value)
         {

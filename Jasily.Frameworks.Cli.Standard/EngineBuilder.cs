@@ -52,88 +52,66 @@ namespace Jasily.Frameworks.Cli
         }
 
         private readonly List<Element> _types = new List<Element>();
+        private readonly ServiceCollection _services = new ServiceCollection();
+        private readonly AutoResolvedTypes _autoResolvedTypes = new AutoResolvedTypes();
 
         /// <summary>
         /// ctor.
         /// </summary>
         public EngineBuilder()
         {
-            var sc = this.Services;
-            sc.UseMethodInvoker();
-            sc.UseAwaiterAdapter();
+            this._services.UseMethodInvoker(); // invoker
+            this._services.UseAwaiterAdapter(); // wait for task
 
             // internal
-            sc.AddSingleton(typeof(TypeConfiguration<>));
+            this._services.AddSingleton(typeof(TypeConfiguration<>));
 
             // base
-            sc.AddSingleton(StringComparer.OrdinalIgnoreCase);
+            this._services.AddSingleton(StringComparer.OrdinalIgnoreCase);
 
             // mapper
-            sc.AddSingleton(typeof(ClassCommand<>));
+            this._services.AddSingleton(typeof(ClassCommand<>));
 
             // core
-            sc.AddSingleton<IEngine, Engine>();
-            sc.AddScoped<ISession, Session>();
-            sc.AddScoped<IArgumentList, ArgumentList>();
-            sc.AddScoped(typeof(InstanceContainer<>));
-            sc.AddTransient<IOutputer, Outputer>();
+            this.AddAutoResolvedSingleton<IEngine, Engine>();
+            this.AddAutoResolvedScoped<ISession, Session>();
+            this._services.AddScoped<IArgumentList, ArgumentList>();
+            this._services.AddScoped(typeof(InstanceContainer<>));
+            this.AddAutoResolvedTransient<IOutputer, Outputer>();
 
             // configureable
-            sc.AddTransient<IArgumentParser, ArgumentParser>();
-            sc.AddTransient<IUsageDrawer, UsageDrawer>();
+            this._services.AddTransient<IArgumentParser, ArgumentParser>();
+            this._services.AddTransient<IUsageDrawer, UsageDrawer>();
 
             // converters
-            sc.AddSingleton<IValueConverter<bool>, BooleanConverter>()
-                .AddSingleton<IValueConverter<int>, Int32Converter>()
-                .AddSingleton<IValueConverter<uint>, UInt32Converter>()
-                .AddSingleton<IValueConverter<long>, Int64Converter>()
-                .AddSingleton<IValueConverter<ulong>, UInt64Converter>()
-                .AddSingleton<IValueConverter<float>, SingleConverter>()
-                .AddSingleton<IValueConverter<double>, DoubleConverter>()
-                .AddSingleton<IValueConverter<string>, StringConverter>();
-            
-            // array converters
-            sc.AddSingleton(typeof(ArrayConverter<>));
-
-            sc.AddSingleton<IValueConverterFactory, ValueConverterFactory>();
+            this._services.InstallValueConverter();
 
             // formater
-            sc.AddTransient<IValueFormater, ObjectFormater>();
+            this._services.AddTransient<IValueFormater, ObjectFormater>();
         }
 
-        private ServiceCollection Services { get; } = new ServiceCollection();
-
-        /// <summary>
-        /// add assembly to engine root.
-        /// </summary>
-        /// <param name="assembly"></param>
-        /// <returns></returns>
-        public EngineBuilder AddAssembly([NotNull] Assembly assembly)
+        private void AddAutoResolvedSingleton<TService, TImplementation>()
+            where TService : class
+            where TImplementation : class, TService
         {
-            if (assembly == null) throw new ArgumentNullException(nameof(assembly));
-            foreach (var type in assembly.DefinedTypes)
-            {
-                if (type.GetCustomAttribute<CommandClassAttribute>() != null) this.AddType(type.AsType());
-            } 
-            return this;
+            this._autoResolvedTypes.Add(typeof(TService));
+            this._services.AddSingleton<TService, TImplementation>();
         }
 
-        /// <summary>
-        /// add type to engine root.
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public EngineBuilder AddType(Type type)
+        private void AddAutoResolvedScoped<TService, TImplementation>()
+            where TService : class
+            where TImplementation : class, TService
         {
-            this.Services.AddScoped(type);
-            this._types.Add(Element.CreateTypeElement(type));
-            return this;
+            this._autoResolvedTypes.Add(typeof(TService));
+            this._services.AddScoped<TService, TImplementation>();
         }
 
-        public EngineBuilder AddInstance(object instance)
+        private void AddAutoResolvedTransient<TService, TImplementation>()
+            where TService : class
+            where TImplementation : class, TService
         {
-            this._types.Add(Element.CreateInstanceElement(instance));
-            return this;
+            this._autoResolvedTypes.Add(typeof(TService));
+            this._services.AddTransient<TService, TImplementation>();
         }
 
         /// <summary>
@@ -144,7 +122,7 @@ namespace Jasily.Frameworks.Cli
         public EngineBuilder Use([NotNull] StringComparer comparer)
         {
             if (comparer == null) throw new ArgumentNullException(nameof(comparer));
-            this.Services.AddSingleton(comparer);
+            this._services.AddSingleton(comparer);
             return this;
         }
 
@@ -157,7 +135,7 @@ namespace Jasily.Frameworks.Cli
         public EngineBuilder Use([NotNull] IArgumentParser parser)
         {
             if (parser == null) throw new ArgumentNullException(nameof(parser));
-            this.Services.AddSingleton(parser);
+            this._services.AddSingleton(parser);
             return this;
         }
 
@@ -167,17 +145,17 @@ namespace Jasily.Frameworks.Cli
         /// <typeparam name="T"></typeparam>
         /// <param name="converter"></param>
         /// <returns></returns>
-        public EngineBuilder Use<T>([NotNull] IValueConverter<T> converter)
+        public EngineBuilder Use<T>([NotNull] Converters.IValueConverter<T> converter)
         {
             if (converter == null) throw new ArgumentNullException(nameof(converter));
-            this.Services.AddSingleton(typeof(IValueConverter<T>), converter);
+            this._services.AddSingleton(typeof(Converters.IValueConverter<T>), converter);
             return this;
         }
 
         public EngineBuilder Use([NotNull] IOutput output)
         {
             if (output == null) throw new ArgumentNullException(nameof(output));
-            this.Services.AddSingleton(output);
+            this._services.AddSingleton(output);
             return this;
         }
 
@@ -193,44 +171,16 @@ namespace Jasily.Frameworks.Cli
         /// <summary>
         /// use for unittest
         /// </summary>
-        /// <param name="provider"></param>
+        /// <param name="serviceProvider"></param>
         /// <returns></returns>
         internal IEngine Build(out IServiceProvider serviceProvider)
         {
-            var sc = this.Services;
-            var comparer = (StringComparer)sc.Last(z => z.ImplementationInstance is StringComparer).ImplementationInstance;
-            var provider = sc.BuildServiceProvider();            
+            this._services.AddSingleton(this._autoResolvedTypes.Clone());
+            var provider = this._services.BuildServiceProvider();            
             var engine = (Engine)provider.GetRequiredService<IEngine>();
             var builder = new CommandRouterBuilder(this._types.Select(z => z.GetValue(provider)).ToArray());
-
             serviceProvider = provider;
             return engine.Initialize(builder.Build(provider));
-        }
-
-        /// <summary>
-        /// provide a static for easy to use the engine.
-        /// </summary>
-        /// <param name="assembly"></param>
-        /// <param name="argv"></param>
-        public static object FireAssembly([NotNull] Assembly assembly, [NotNull] string[] argv)
-        {
-            if (assembly == null) throw new ArgumentNullException(nameof(assembly));
-            if (argv == null) throw new ArgumentNullException(nameof(argv));
-
-            return new EngineBuilder().AddAssembly(assembly).Build().Execute(argv);
-        }
-
-        /// <summary>
-        /// provide a static for easy to use the engine.
-        /// </summary>
-        /// <param name="type"></param>
-        /// <param name="argv"></param>
-        public static object FireType([NotNull] Type type, [NotNull] string[] argv)
-        {
-            if (type == null) throw new ArgumentNullException(nameof(type));
-            if (argv == null) throw new ArgumentNullException(nameof(argv));
-
-            return new EngineBuilder().AddType(type).Build().Execute(argv);
         }
 
         /// <summary>
@@ -239,12 +189,12 @@ namespace Jasily.Frameworks.Cli
         /// <param name="instance"></param>
         /// <param name="argv"></param>
         /// <returns></returns>
-        public static object FireInstance([NotNull] object instance, [NotNull] string[] argv)
+        public static object Fire([NotNull] object instance, [NotNull] string[] argv)
         {
             if (instance == null) throw new ArgumentNullException(nameof(instance));
             if (argv == null) throw new ArgumentNullException(nameof(argv));
 
-            return new EngineBuilder().AddInstance(instance).Build().Execute(argv);
+            return new EngineBuilder().Build().Fire(instance).Execute(argv);
         }
     }
 }

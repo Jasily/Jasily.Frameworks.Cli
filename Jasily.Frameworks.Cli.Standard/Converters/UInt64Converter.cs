@@ -1,6 +1,6 @@
 ﻿namespace Jasily.Frameworks.Cli.Converters
 {
-    internal class UInt64Converter : StringConverter<ulong>
+    internal class UInt64Converter : BaseConverter<ulong>
     {
         protected override ulong Convert(string value)
         {

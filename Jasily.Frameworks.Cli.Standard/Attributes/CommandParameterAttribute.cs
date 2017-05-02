@@ -1,9 +1,15 @@
 ﻿using System;
+using System.Linq;
+using Jasily.Frameworks.Cli.Configurations;
 
 namespace Jasily.Frameworks.Cli.Attributes
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [AttributeUsage(AttributeTargets.Parameter)]
-    public sealed class CommandParameterAttribute : Attribute
+    public sealed class CommandParameterAttribute : Attribute,
+        IConfigureableAttribute<INameConfigurator>
     {
         /// <summary>
         /// name for command parameter.
@@ -11,8 +17,15 @@ namespace Jasily.Frameworks.Cli.Attributes
         public string[] Names { get; set; }
 
         /// <summary>
-        /// declare the parameter should not by user input.
+        /// 
         /// </summary>
-        public bool IsAutoPadding { get; set; }
+        /// <param name="configurator"></param>
+        public void Apply(INameConfigurator configurator)
+        {
+            foreach (var name in this.Names ?? Enumerable.Empty<string>())
+            {
+                configurator.AddName(name);
+            }
+        }
     }
 }

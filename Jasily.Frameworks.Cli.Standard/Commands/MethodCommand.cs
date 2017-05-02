@@ -11,12 +11,16 @@ namespace Jasily.Frameworks.Cli.Commands
 {
     internal sealed class MethodCommand<T> : BaseCommand
     {
+        private readonly TypeConfiguration<T>.MethodConfiguration _configuration;
         private IInstanceMethodInvoker<T> _invoker;
 
         public MethodCommand(TypeConfiguration<T>.MethodConfiguration configuration)
-            : base(configuration.ServiceProvider, configuration.Method, configuration)
+            : base(configuration.Method, configuration)
         {
+            this._configuration = configuration;
         }
+
+        public override IReadOnlyList<IParameterConfiguration> ParameterConfigurations => this._configuration.ParameterConfigurations;
 
         public override object Invoke(object instance, IServiceProvider serviceProvider, OverrideArguments args)
         {

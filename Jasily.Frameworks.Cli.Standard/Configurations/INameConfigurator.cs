@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace Jasily.Frameworks.Cli.Configurations
 {
+    /// <summary>
+    /// name configurator
+    /// </summary>
     public interface INameConfigurator
     {
         /// <summary>
@@ -10,7 +14,7 @@ namespace Jasily.Frameworks.Cli.Configurations
         /// </summary>
         /// <exception cref="ArgumentNullException"></exception>
         /// <param name="name"></param>
-        void AddName(string name);
+        void AddName([NotNull] string name);
 
         /// <summary>
         /// ignore declaring C# name.

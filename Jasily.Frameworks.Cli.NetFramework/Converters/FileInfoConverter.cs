@@ -4,7 +4,7 @@ using Jasily.Frameworks.Cli.Exceptions;
 
 namespace Jasily.Frameworks.Cli.Converters
 {
-    internal class FileInfoConverter : StringConverter<FileInfo>
+    internal class FileInfoConverter : BaseConverter<FileInfo>
     {
         protected override FileInfo Convert(string value)
         {

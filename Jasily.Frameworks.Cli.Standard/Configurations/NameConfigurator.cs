@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reflection;
 
 namespace Jasily.Frameworks.Cli.Configurations
 {
-    internal class NameConfigurator : INameConfigurator
+    internal class NameConfigurator : BaseConfigurator, INameConfigurator
     {
         private readonly List<string> _names = new List<string>();
 
@@ -16,9 +15,7 @@ namespace Jasily.Frameworks.Cli.Configurations
 
         public void AddName(string name)
         {
-            if (name == null) throw new ArgumentNullException(nameof(name));
-            if (string.IsNullOrWhiteSpace(name)) return;
-            this._names.Add(name.Trim().Replace(' ', '-'));
+            this._names.Add(GetSafeName(name));
         }
 
         public void IgnoreDeclaringName()
@@ -30,7 +27,7 @@ namespace Jasily.Frameworks.Cli.Configurations
 
         public bool IsIgnoreDeclaringName { get; private set; }
 
-        public IReadOnlyList<string> BuildName(string declaringName)
+        public IReadOnlyList<string> CreateNameList(string declaringName)
         {
             var names = new List<string>();
             if (!this.IsIgnoreDeclaringName || this._names.Count == 0)

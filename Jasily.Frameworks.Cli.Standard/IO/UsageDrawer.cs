@@ -35,14 +35,14 @@ namespace Jasily.Frameworks.Cli.IO
             }
         }
 
-        public void DrawParameter(ICommandProperties cmd, IReadOnlyList<ParameterInfoDescriptor> parameters)
+        public void DrawParameter(ICommandProperties command, IReadOnlyList<IParameterProperties> parameters)
         {
             this.outputer.WriteLine(OutputLevel.Usage, "Usage:");
-            this.outputer.WriteLine(OutputLevel.Usage, $"   Parameters of Commands <{cmd.Names[0]}>:");
+            this.outputer.WriteLine(OutputLevel.Usage, $"   Parameters of Commands <{command.Names[0]}>:");
             var sb = new StringBuilder();
             foreach (var parameter in parameters)
             {
-                if (parameter.IsAutoPadding) continue;
+                if (parameter.IsResolveByEngine) continue;
 
                 bool IsOptional()
                 {
@@ -51,7 +51,7 @@ namespace Jasily.Frameworks.Cli.IO
                         return false;
                     }
 
-                    return parameter.ParameterInfo.HasDefaultValue;
+                    return parameter.IsOptional;
                 }
 
                 sb.Clear();
@@ -62,16 +62,17 @@ namespace Jasily.Frameworks.Cli.IO
                 }
                 else
                 {
-                    sb.Append("(required)");                    
+                    sb.Append("(required)");
                 }
-                var name = parameter.ParameterInfo.Name;
+
                 sb.Append("   ");
-                sb.Append(name);
+                sb.Append(parameter.Names[0]);
                 sb.Append(" : ");
                 if (parameter.IsArray)
                 {
                     sb.Append('[');
-                    sb.Append(parameter.ParameterInfo.ParameterType.GetElementType().Name);
+                    // ReSharper disable once PossibleNullReferenceException
+                    sb.Append(parameter.ArrayElementType.Name);
                     sb.Append(", ...]");
 
                     void AppendIfRangeValid(string value)

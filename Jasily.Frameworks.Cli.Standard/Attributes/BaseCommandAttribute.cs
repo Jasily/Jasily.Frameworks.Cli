@@ -5,6 +5,9 @@ using Jasily.Frameworks.Cli.Configurations;
 
 namespace Jasily.Frameworks.Cli.Attributes
 {
+    /// <summary>
+    /// the base command attribute.
+    /// </summary>
     public abstract class BaseCommandAttribute : Attribute,
         IConfigureableAttribute<INameConfigurator>
     {

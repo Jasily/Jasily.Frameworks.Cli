@@ -12,11 +12,12 @@ namespace Jasily.Frameworks.Cli.Commands
     {
         private IInstanceMethodInvoker<T> _invoker;
 
-        public PropertyCommand(TypeConfiguration<T>.PropertyConfiguration configuration) : base(
-            configuration.ServiceProvider, configuration.Property.GetMethod, configuration)
+        public PropertyCommand(TypeConfiguration<T>.PropertyConfiguration configuration) : base(configuration.Property.GetMethod, configuration)
         {
-            
+            this.ParameterConfigurations = new IParameterConfiguration[0].AsReadOnly();
         }
+
+        public override IReadOnlyList<IParameterConfiguration> ParameterConfigurations { get; }
 
         public override object Invoke(object instance, IServiceProvider serviceProvider, OverrideArguments args)
         {

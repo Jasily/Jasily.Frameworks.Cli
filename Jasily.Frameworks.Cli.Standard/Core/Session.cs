@@ -32,7 +32,7 @@ namespace Jasily.Frameworks.Cli.Core
             if (this._command != null)
             {
                 this._serviceProvider.GetRequiredService<IUsageDrawer>()
-                    .DrawParameter(this._command.Properties, this._command.Parameters);
+                    .DrawParameter(this._command.Properties, this._command.ParameterConfigurations);
             }
             else if (this._router != null)
             {

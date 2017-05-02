@@ -1,6 +1,6 @@
 ﻿namespace Jasily.Frameworks.Cli.Converters
 {
-    internal class SingleConverter : StringConverter<float>
+    internal class SingleConverter : BaseConverter<float>
     {
         protected override float Convert(string value)
         {
