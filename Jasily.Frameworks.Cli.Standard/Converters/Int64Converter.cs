@@ -2,7 +2,7 @@
 {
     internal class Int64Converter : StringConverter<long>
     {
-        public override long Convert(string value)
+        protected override long Convert(string value)
         {
             return long.Parse(value);
         }

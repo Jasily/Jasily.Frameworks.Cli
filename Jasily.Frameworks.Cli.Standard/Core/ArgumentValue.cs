@@ -7,12 +7,12 @@ namespace Jasily.Frameworks.Cli.Core
 {
     public class ArgumentValue
     {
-        private readonly List<string> values = new List<string>();
+        private readonly List<string> _values = new List<string>();
 
         internal ArgumentValue(ParameterInfoDescriptor parameter)
         {
             this.Parameter = parameter;
-            this.Values = new ReadOnlyCollection<string>(this.values);
+            this.Values = new ReadOnlyCollection<string>(this._values);
         }
 
         /// <summary>
@@ -25,17 +25,17 @@ namespace Jasily.Frameworks.Cli.Core
         public void AddValue(string value)
         {
             value = this.Parameter.ConvertValueInternal(value);
-            this.values.Add(value);
+            this._values.Add(value);
         }
 
         public bool IsSetedValue()
         {
-            return this.Parameter.IsArray || this.values.Count > 0;
+            return this.Parameter.IsArray || this._values.Count > 0;
         }
 
         public bool IsAcceptValue()
         {
-            return this.Parameter.IsArray || this.values.Count == 0;
+            return this.Parameter.IsArray || this._values.Count == 0;
         }
 
         /// <summary>

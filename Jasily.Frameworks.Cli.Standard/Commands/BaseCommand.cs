@@ -39,14 +39,8 @@ namespace Jasily.Frameworks.Cli.Commands
         {
             if (serviceProvider == null) throw new ArgumentNullException(nameof(serviceProvider));
             if (instance == null) throw new ArgumentNullException(nameof(instance));
-            var session = serviceProvider.GetRequiredService<ISession>();
-
-            void DrawUsage()
-            {
-                serviceProvider.GetRequiredService<IUsageDrawer>()
-                    .DrawParameter(this.Properties, this.Parameters);
-                throw new TerminationException();
-            }
+            var session = (Session) serviceProvider.GetRequiredService<ISession>();
+            session.AddCommand(this);
 
             OverrideArguments GetArguments()
             {
@@ -57,7 +51,8 @@ namespace Jasily.Frameworks.Cli.Commands
                 catch (ArgumentsException e)
                 {
                     serviceProvider.GetRequiredService<IOutputer>().WriteLine(OutputLevel.Error, e.Message);
-                    DrawUsage();
+                    session.DrawUsage();
+                    session.Termination();
                     throw;
                 }
             }
@@ -71,7 +66,8 @@ namespace Jasily.Frameworks.Cli.Commands
                 }
                 catch (ParameterResolveException)
                 {
-                    DrawUsage();
+                    session.DrawUsage();
+                    session.Termination();
                     throw;
                 }
             }

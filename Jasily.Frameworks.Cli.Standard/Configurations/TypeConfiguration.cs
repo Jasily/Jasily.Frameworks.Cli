@@ -193,15 +193,5 @@ namespace Jasily.Frameworks.Cli.Configurations
                 return new MethodCommand<TClass>(this);
             }
         }
-
-        internal class ParameterAttribute
-        {
-            private readonly IServiceProvider _serviceProvider;
-
-            public ParameterAttribute(IServiceProvider serviceProvider, ParameterInfo parameter)
-            {
-                this._serviceProvider = serviceProvider;
-            }
-        }
     }
 }

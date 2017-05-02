@@ -3,7 +3,7 @@ using Jasily.Frameworks.Cli.Attributes;
 using Microsoft.Extensions.DependencyInjection;
 using Jasily.Frameworks.Cli.Commands;
 using System.Collections.Generic;
-using Jasily.Frameworks.Cli.Configures;
+using Jasily.Frameworks.Cli.Configurations;
 
 namespace Jasily.Frameworks.Cli.Tests.TestInternal
 {
@@ -28,12 +28,12 @@ namespace Jasily.Frameworks.Cli.Tests.TestInternal
         {
             var builder = new EngineBuilder();
             builder.Build(out var provider);
-            Assert.AreEqual(false, provider.GetRequiredService<TypeConfigure<Class001>>().HasCommandClassAttribute);
-            Assert.AreEqual(true, provider.GetRequiredService<TypeConfigure<Class002>>().HasCommandClassAttribute);
-            Assert.AreEqual(true, provider.GetRequiredService<TypeConfigure<Class003>>().GetConfigure(
-                typeof(Class003).GetProperty("Property1")).HasCommandPropertyAttribute);
-            Assert.AreEqual(false, provider.GetRequiredService<TypeConfigure<Class003>>().GetConfigure(
-                typeof(Class003).GetProperty("Property2")).HasCommandPropertyAttribute);
+            Assert.AreEqual(false, provider.GetRequiredService<TypeConfiguration<Class001>>().IsDefinedCommand);
+            Assert.AreEqual(true, provider.GetRequiredService<TypeConfiguration<Class002>>().IsDefinedCommand);
+            Assert.AreEqual(true, provider.GetRequiredService<TypeConfiguration<Class003>>().GetConfigure(
+                typeof(Class003).GetProperty("Property1")).IsDefinedCommand);
+            Assert.AreEqual(false, provider.GetRequiredService<TypeConfiguration<Class003>>().GetConfigure(
+                typeof(Class003).GetProperty("Property2")).IsDefinedCommand);
         }
     }
 }

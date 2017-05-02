@@ -2,7 +2,7 @@
 {
     internal class DoubleConverter : StringConverter<double>
     {
-        public override double Convert(string value)
+        protected override double Convert(string value)
         {
             return double.Parse(value);
         }

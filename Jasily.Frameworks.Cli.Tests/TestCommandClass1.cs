@@ -37,10 +37,10 @@ namespace Jasily.Frameworks.Cli.Tests
         {
             foreach (var item in this.Build<CommandClass>())
             {
-                Assert.AreEqual(1, item.Execute(new string[] {
+                Assert.AreEqual(1, item.Execute(new[] {
                     nameof(CommandClass.Number),
                     "1" }));
-                Assert.AreEqual(455, item.Execute(new string[] {
+                Assert.AreEqual(455, item.Execute(new[] {
                     nameof(CommandClass.Select),
                     "1", "2", "455" }));
             }

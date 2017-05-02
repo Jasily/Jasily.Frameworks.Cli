@@ -5,9 +5,9 @@ namespace Jasily.Frameworks.Cli.Converters
 {
     internal class DirectoryInfoConverter : StringConverter<DirectoryInfo>
     {
-        public override DirectoryInfo Convert(string value)
+        protected override DirectoryInfo Convert(string value)
         {
-            if (!Directory.Exists(value)) throw new MessageException("file is not exists.");
+            if (!Directory.Exists(value)) throw new ConvertException("file is not exists.");
 
             return new DirectoryInfo(value);
         }

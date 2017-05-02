@@ -7,20 +7,11 @@ using Jasily.Frameworks.Cli.Core;
 
 namespace Jasily.Frameworks.Cli.Exceptions
 {
-    public class ConvertException : Exception
+    public sealed class ConvertException : CliException
     {
-        public ConvertException(ArgumentValue argument, string message)
-            : base(message)
+        public ConvertException(string message) : base(message)
         {
-            this.Argument = argument;
+            
         }
-
-        public ConvertException(ArgumentValue argument, string message, Exception innerException)
-            : base(message, innerException)
-        {
-            this.Argument = argument;
-        }
-
-        public ArgumentValue Argument { get; }
     }
 }

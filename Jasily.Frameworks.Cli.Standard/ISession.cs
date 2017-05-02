@@ -11,5 +11,9 @@ namespace Jasily.Frameworks.Cli
         IReadOnlyList<string> OriginalArgv { get; }
 
         IArgumentList Argv { get; }
+
+        void DrawUsage();
+
+        void Termination();
     }
 }

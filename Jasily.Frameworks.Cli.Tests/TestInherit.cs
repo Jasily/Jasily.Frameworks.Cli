@@ -61,12 +61,12 @@ namespace Jasily.Frameworks.Cli.Tests
         {
             foreach (var item in this.Build<Class4>())
             {
-                Assert.AreEqual(1, item.Execute(new string[] { nameof(Class4.Value) }));
+                Assert.AreEqual(1, item.Execute(new[] { nameof(Class4.Value) }));
             }
 
             foreach (var item in this.Build<Class5>())
             {
-                Assert.AreEqual(1, item.Execute(new string[] { nameof(Class5.Value) }));
+                Assert.AreEqual(1, item.Execute(new[] { nameof(Class5.Value) }));
             }
         }
     }

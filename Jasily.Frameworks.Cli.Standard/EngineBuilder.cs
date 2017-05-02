@@ -23,16 +23,16 @@ namespace Jasily.Frameworks.Cli
     {
         private struct Element
         {
-            public bool IsType;
-            public Type Type;
-            public object Instance;
+            private bool _isType;
+            private Type _type;
+            private object _instance;
 
             public static Element CreateTypeElement(Type type)
             {
                 return new Element()
                 {
-                    IsType = true,
-                    Type = type
+                    _isType = true,
+                    _type = type
                 };
             }
 
@@ -40,18 +40,18 @@ namespace Jasily.Frameworks.Cli
             {
                 return new Element()
                 {
-                    IsType = false,
-                    Instance = instance
+                    _isType = false,
+                    _instance = instance
                 };
             }
 
             public object GetValue(IServiceProvider provider)
             {
-                return this.IsType ? provider.GetRequiredService(this.Type) : this.Instance;
+                return this._isType ? provider.GetRequiredService(this._type) : this._instance;
             }
         }
 
-        private readonly List<Element> types = new List<Element>();
+        private readonly List<Element> _types = new List<Element>();
 
         /// <summary>
         /// ctor.
@@ -85,8 +85,10 @@ namespace Jasily.Frameworks.Cli
             // converters
             sc.AddSingleton<IValueConverter<bool>, BooleanConverter>()
                 .AddSingleton<IValueConverter<int>, Int32Converter>()
+                .AddSingleton<IValueConverter<uint>, UInt32Converter>()
                 .AddSingleton<IValueConverter<long>, Int64Converter>()
-                .AddSingleton<IValueConverter<float>, FloatConverter>()
+                .AddSingleton<IValueConverter<ulong>, UInt64Converter>()
+                .AddSingleton<IValueConverter<float>, SingleConverter>()
                 .AddSingleton<IValueConverter<double>, DoubleConverter>()
                 .AddSingleton<IValueConverter<string>, StringConverter>();
             
@@ -124,13 +126,13 @@ namespace Jasily.Frameworks.Cli
         public EngineBuilder AddType(Type type)
         {
             this.Services.AddScoped(type);
-            this.types.Add(Element.CreateTypeElement(type));
+            this._types.Add(Element.CreateTypeElement(type));
             return this;
         }
 
         public EngineBuilder AddInstance(object instance)
         {
-            this.types.Add(Element.CreateInstanceElement(instance));
+            this._types.Add(Element.CreateInstanceElement(instance));
             return this;
         }
 
@@ -199,7 +201,7 @@ namespace Jasily.Frameworks.Cli
             var comparer = (StringComparer)sc.Last(z => z.ImplementationInstance is StringComparer).ImplementationInstance;
             var provider = sc.BuildServiceProvider();            
             var engine = (Engine)provider.GetRequiredService<IEngine>();
-            var builder = new CommandRouterBuilder(this.types.Select(z => z.GetValue(provider)).ToArray());
+            var builder = new CommandRouterBuilder(this._types.Select(z => z.GetValue(provider)).ToArray());
 
             serviceProvider = provider;
             return engine.Initialize(builder.Build(provider));

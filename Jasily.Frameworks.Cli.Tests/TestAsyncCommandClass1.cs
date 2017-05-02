@@ -11,12 +11,14 @@ namespace Jasily.Frameworks.Cli.Tests
         [CommandClass]
         public class CommandClass
         {
+            [CommandMethod]
             public int Number([CommandParameter(IsAutoPadding = true)] IServiceProvider provider, int value)
             {
                 if (provider == null) throw new ArgumentNullException();
                 return value;
             }
 
+            [CommandMethod]
             public int Select(int val1, int val2, int val3)
             {
                 return val3;
@@ -75,11 +77,11 @@ namespace Jasily.Frameworks.Cli.Tests
         {
             foreach (var item in this.Build<AsyncCommandClass1>())
             {
-                Assert.AreEqual(1, item.Execute(new string[] {
+                Assert.AreEqual(1, item.Execute(new[] {
                     nameof(AsyncCommandClass1.GetCommandClass2),
                     nameof(CommandClass2.Number),
                     "1" }));
-                Assert.AreEqual(455, item.Execute(new string[] {
+                Assert.AreEqual(455, item.Execute(new[] {
                     nameof(AsyncCommandClass1.GetCommandClass2),
                     nameof(CommandClass2.Select),
                     "1", "2", "455" }));

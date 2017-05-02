@@ -15,23 +15,27 @@ namespace Jasily.Frameworks.Cli.Converters
             return value is ArgumentValue || value is string;
         }
 
-        public abstract T Convert([NotNull] string value);
+        protected abstract T Convert([NotNull] string value);
 
-        public virtual T Convert([NotNull] ArgumentValue value)
+        private T Convert([NotNull] ArgumentValue value)
         {
             if (value.Values.Count > 1)
             {
-                throw new ConvertException(value, "too many arguments.");
+                throw new ConvertException("too many arguments.");
             }
 
             var str = value.Values.Single();
             try
             {
                 return this.Convert(str);
-            } 
-            catch (Exception e)
+            }
+            catch (ConvertException)
             {
-                throw new ConvertException(value, e.Message, e);
+                throw;
+            }
+            catch (Exception)
+            {
+                throw new ConvertException($"connot convert value <{str}> to type <{typeof(T).Name}>");
             }
         }
 
@@ -53,7 +57,7 @@ namespace Jasily.Frameworks.Cli.Converters
 
     public class StringConverter : StringConverter<string>
     {
-        public override string Convert([NotNull] string value)
+        protected override string Convert(string value)
         {
             return value;
         }

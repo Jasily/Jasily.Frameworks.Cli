@@ -1,8 +1,8 @@
 ﻿namespace Jasily.Frameworks.Cli.Converters
 {
-    internal class FloatConverter : StringConverter<float>
+    internal class SingleConverter : StringConverter<float>
     {
-        public override float Convert(string value)
+        protected override float Convert(string value)
         {
             return float.Parse(value);
         }

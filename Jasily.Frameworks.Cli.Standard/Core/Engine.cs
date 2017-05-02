@@ -12,26 +12,26 @@ namespace Jasily.Frameworks.Cli.Core
 {
     internal class Engine : IEngine
     {
-        private readonly IServiceProvider serviceProvider;
-        private CommandRouter routerRoot;
+        private readonly IServiceProvider _serviceProvider;
+        private CommandRouter _routerRoot;
 
         public Engine(IServiceProvider serviceProvider)
         {
-            this.serviceProvider = serviceProvider;
+            this._serviceProvider = serviceProvider;
         }
 
         public Engine Initialize(CommandRouter routerRoot)
         {
-            this.routerRoot = routerRoot;
+            this._routerRoot = routerRoot;
             return this;
         }
 
-        public object Execute([NotNull][ItemNotNull] string[] argv)
+        public object Execute([NotNull, ItemNotNull] string[] argv)
         {
             if (argv == null) throw new ArgumentNullException(nameof(argv));
             if (argv.Any(z => z == null)) throw new ArgumentException("element in argv cannot be null.", nameof(argv));
 
-            using (var s = this.serviceProvider.CreateScope())
+            using (var s = this._serviceProvider.CreateScope())
             {
                 var session = (Session) s.ServiceProvider.GetRequiredService<ISession>();
                 session.OriginalArgv = new ReadOnlyCollection<string>(argv);                
@@ -40,11 +40,11 @@ namespace Jasily.Frameworks.Cli.Core
                 session.Argv = args;
                 try
                 {
-                    var value = this.routerRoot.Execute(s.ServiceProvider);
+                    var value = this._routerRoot.Execute(s.ServiceProvider);
                     if (value != null)
                     {
-                        var formater = this.serviceProvider.GetRequiredService<IValueFormater>();
-                        this.serviceProvider.GetRequiredService<IOutputer>().WriteLine(OutputLevel.Normal, formater.Format(value));
+                        var formater = this._serviceProvider.GetRequiredService<IValueFormater>();
+                        this._serviceProvider.GetRequiredService<IOutputer>().WriteLine(OutputLevel.Normal, formater.Format(value));
                     }
                     return value;
                 }
@@ -52,17 +52,14 @@ namespace Jasily.Frameworks.Cli.Core
                 {
                     // ignore.
                 }
-                catch (ConvertException e)
-                {
-                    throw;
-                }
                 catch (CliException e)
                 {
-                    this.serviceProvider.GetRequiredService<IOutputer>().WriteLine(OutputLevel.Error, e.Message);
+                    this._serviceProvider.GetRequiredService<IOutputer>().WriteLine(OutputLevel.Error, e.Message);
+                    session.DrawUsage();
                 }
                 catch (NotImplementedException e)
                 {
-                    this.serviceProvider.GetRequiredService<IOutputer>().WriteLine(OutputLevel.Error, e.ToString());
+                    this._serviceProvider.GetRequiredService<IOutputer>().WriteLine(OutputLevel.Error, e.ToString());
                 }
             }
 

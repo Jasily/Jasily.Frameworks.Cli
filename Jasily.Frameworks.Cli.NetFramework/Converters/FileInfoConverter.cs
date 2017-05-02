@@ -6,9 +6,9 @@ namespace Jasily.Frameworks.Cli.Converters
 {
     internal class FileInfoConverter : StringConverter<FileInfo>
     {
-        public override FileInfo Convert(string value)
+        protected override FileInfo Convert(string value)
         {
-            if (!File.Exists(value)) throw new MessageException("file is not exists.");
+            if (!File.Exists(value)) throw new ConvertException("file is not exists.");
 
             return new FileInfo(value);
         }

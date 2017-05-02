@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using Jasily.Frameworks.Cli.Configurations;
+using Jasily.Frameworks.Cli.Core;
 using Microsoft.Extensions.DependencyInjection;
 using JetBrains.Annotations;
 using Jasily.Frameworks.Cli.IO;
@@ -42,7 +43,8 @@ namespace Jasily.Frameworks.Cli.Commands
 
         public object Execute(IServiceProvider serviceProvider)
         {
-            var session = serviceProvider.GetRequiredService<ISession>();
+            var session = (Session) serviceProvider.GetRequiredService<ISession>();
+            session.AddRouter(this);
 
             bool TryResolve(IArgumentList args, out ICommand command)
             {
@@ -77,11 +79,10 @@ namespace Jasily.Frameworks.Cli.Commands
             {
                 return cmd.Invoke(serviceProvider, null);
             }
-            else
-            {
-                serviceProvider.GetRequiredService<IUsageDrawer>().DrawRouter(this);
-                throw new TerminationException();
-            }
+
+            session.DrawUsage();
+            session.Termination();
+            return null;
         }
     }
 }
