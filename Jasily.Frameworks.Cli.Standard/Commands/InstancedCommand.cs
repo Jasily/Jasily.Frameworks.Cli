@@ -1,29 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using Jasily.DependencyInjection.MethodInvoker;
+using Jasily.Frameworks.Cli.Configurations;
+using JetBrains.Annotations;
 
 namespace Jasily.Frameworks.Cli.Commands
 {
-    internal class InstancedCommand : ICallableCommand
+    internal class InstancedCommand : ICommand
     {
-        private readonly object instance;
-        private readonly RealizedCommand innerCommand;
+        private readonly object _instance;
+        private readonly ICommand _innerCommand;
 
-        public InstancedCommand(RealizedCommand innerCommand, object instance)
+        public InstancedCommand([NotNull] ICommand innerCommand, [NotNull] object instance)
         {
-            this.innerCommand = innerCommand;
-            this.instance = instance;
+            this._innerCommand = innerCommand ?? throw new ArgumentNullException(nameof(innerCommand));
+            this._instance = instance ?? throw new ArgumentNullException(nameof(instance));
         }
 
-        public IReadOnlyList<string> Names => this.innerCommand.Names;
-
-        public string DeclaringName => this.innerCommand.DeclaringName;
-
-        public bool IgnoreDeclaringName => this.innerCommand.IgnoreDeclaringName;
-
-        public object Invoke(IServiceProvider serviceProvider)
+        public object Invoke(IServiceProvider serviceProvider, object instance)
         {
-            return this.innerCommand.Invoke(serviceProvider, this.instance);
+            if (instance != null) throw new ArgumentException("WTF");
+            return this._innerCommand.Invoke(serviceProvider, this._instance);
         }
+
+        public ICommandProperties Properties => this._innerCommand.Properties;
     }
 }

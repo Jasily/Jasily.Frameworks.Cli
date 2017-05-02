@@ -12,7 +12,7 @@ using Jasily.Frameworks.Cli.Commands;
 using JetBrains.Annotations;
 using System.Collections.Generic;
 using Jasily.DependencyInjection.AwaiterAdapter;
-using Jasily.Frameworks.Cli.Configures;
+using Jasily.Frameworks.Cli.Configurations;
 
 namespace Jasily.Frameworks.Cli
 {
@@ -63,7 +63,7 @@ namespace Jasily.Frameworks.Cli
             sc.UseAwaiterAdapter();
 
             // internal
-            sc.AddSingleton(typeof(TypeConfigure<>));
+            sc.AddSingleton(typeof(TypeConfiguration<>));
 
             // base
             sc.AddSingleton(StringComparer.OrdinalIgnoreCase);

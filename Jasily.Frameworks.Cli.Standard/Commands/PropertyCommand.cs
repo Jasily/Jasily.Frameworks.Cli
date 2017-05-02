@@ -3,22 +3,31 @@ using System.Collections.Generic;
 using System.Reflection;
 using Jasily.DependencyInjection.MethodInvoker;
 using Jasily.Frameworks.Cli.Attributes;
+using Jasily.Frameworks.Cli.Configurations;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Jasily.Frameworks.Cli.Commands
 {
-    internal sealed class PropertyCommand<TClass> : RealizedCommand<TClass>
+    internal sealed class PropertyCommand<T> : BaseCommand
     {
-        public PropertyCommand(IServiceProvider serviceProvider, PropertyInfo property)
-            : base(serviceProvider, property.GetMethod, property.GetCustomAttribute<CommandPropertyAttribute>())
+        private IInstanceMethodInvoker<T> _invoker;
+
+        public PropertyCommand(TypeConfiguration<T>.PropertyConfiguration configuration) : base(
+            configuration.ServiceProvider, configuration.Property.GetMethod, configuration)
         {
-            this.DeclaringName = property.Name;
+            
         }
 
-        public override string DeclaringName { get; }
-
-        public override object Invoke(TClass instance, IServiceProvider serviceProvider, OverrideArguments args)
+        public override object Invoke(object instance, IServiceProvider serviceProvider, OverrideArguments args)
         {
-            return this.Method.Invoke(instance, new object[0]);
+            if (this._invoker == null)
+            {
+                this._invoker = serviceProvider
+                    .GetRequiredService<IMethodInvokerFactory<T>>()
+                    .GetInstanceMethodInvoker((MethodInfo)this.Method);
+            }
+
+            return this._invoker.Invoke((T)instance, serviceProvider, args);
         }
     }
 }

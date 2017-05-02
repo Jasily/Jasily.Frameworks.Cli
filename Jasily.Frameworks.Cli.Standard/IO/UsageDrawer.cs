@@ -2,6 +2,7 @@
 using System.Text;
 using Jasily.Frameworks.Cli.Commands;
 using System.Linq;
+using Jasily.Frameworks.Cli.Configurations;
 
 namespace Jasily.Frameworks.Cli.IO
 {
@@ -23,7 +24,6 @@ namespace Jasily.Frameworks.Cli.IO
             {
                 sb.Clear();
                 var names = new Queue<string>();
-                if (!cmd.IgnoreDeclaringName) names.Enqueue(cmd.DeclaringName);
                 foreach (var n in cmd.Names) names.Enqueue(n);                
                 sb.Append("      ").Append(names.Dequeue());
                 if (names.Count > 0)
@@ -38,8 +38,7 @@ namespace Jasily.Frameworks.Cli.IO
         public void DrawParameter(ICommandProperties cmd, IReadOnlyList<ParameterInfoDescriptor> parameters)
         {
             this.outputer.WriteLine(OutputLevel.Usage, "Usage:");
-            var cmdName = cmd.IgnoreDeclaringName ? cmd.Names[0] : cmd.DeclaringName;
-            this.outputer.WriteLine(OutputLevel.Usage, $"   Parameters of Commands <{cmdName}>:");
+            this.outputer.WriteLine(OutputLevel.Usage, $"   Parameters of Commands <{cmd.Names[0]}>:");
             var sb = new StringBuilder();
             foreach (var parameter in parameters)
             {

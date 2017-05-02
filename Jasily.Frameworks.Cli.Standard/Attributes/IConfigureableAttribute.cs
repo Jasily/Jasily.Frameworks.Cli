@@ -7,9 +7,9 @@ namespace Jasily.Frameworks.Cli.Attributes
     public interface IConfigureableAttribute<in T>
     {
         /// <summary>
-        /// apply to configuration.
+        /// apply to configurator.
         /// </summary>
-        /// <param name="configuration"></param>
-        void Apply(T configuration);
+        /// <param name="configurator"></param>
+        void Apply(T configurator);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using Jasily.Frameworks.Cli.Configurations;
 using Microsoft.Extensions.DependencyInjection;
 using JetBrains.Annotations;
 using Jasily.Frameworks.Cli.IO;
@@ -10,20 +11,20 @@ namespace Jasily.Frameworks.Cli.Commands
 {
     internal class CommandRouter : ICommandRouter
     {
-        public IReadOnlyCollection<ICallableCommand> Commands { get; }
+        public IReadOnlyCollection<ICommand> Commands { get; }
 
-        public IReadOnlyDictionary<string, ICallableCommand> CommandsMap { get; }
+        public IReadOnlyDictionary<string, ICommand> CommandsMap { get; }
 
-        IReadOnlyCollection<ICommandProperties> ICommandRouter.Commands => this.Commands;
+        IReadOnlyCollection<ICommandProperties> ICommandRouter.Commands => this.Commands.Select(z => z.Properties).ToArray()
+            .AsReadOnly();
 
-        public CommandRouter(StringComparer comparer, IEnumerable<ICallableCommand> commands)
+        public CommandRouter(StringComparer comparer, IEnumerable<ICommand> commands)
         {
-            this.Commands = commands.ToArray();
-            var map = new Dictionary<string, ICallableCommand>(comparer);
-            foreach (var cmd in commands)
+            this.Commands = commands.ToArray().AsReadOnly();
+            var map = new Dictionary<string, ICommand>(comparer);
+            foreach (var cmd in this.Commands)
             {
-                var mapnames = cmd.IgnoreDeclaringName ? cmd.Names : cmd.Names.Concat(new string[] { cmd.DeclaringName });
-                foreach (var name in mapnames)
+                foreach (var name in cmd.Properties.Names)
                 {
                     if (map.TryGetValue(name, out var x) && x != cmd)
                     {
@@ -43,12 +44,12 @@ namespace Jasily.Frameworks.Cli.Commands
         {
             var session = serviceProvider.GetRequiredService<ISession>();
 
-            bool TryResolve(IArgumentList args, out ICallableCommand command)
+            bool TryResolve(IArgumentList args, out ICommand command)
             {
                 switch (this.Commands.Count)
                 {
                     case 0:
-                        command = default(ICallableCommand);
+                        command = default(ICommand);
                         return session.UnknownArguments<bool>();
 
                     case 1:
@@ -67,14 +68,14 @@ namespace Jasily.Frameworks.Cli.Commands
                             serviceProvider.GetRequiredService<IOutputer>()
                                 .WriteLine(OutputLevel.Error, $"unknown command <{name}>");
                         }
-                        command = default(ICallableCommand);
+                        command = default(ICommand);
                         return false;
                 }
             }
                         
             if (TryResolve(session.Argv, out var cmd))
             {
-                return cmd.Invoke(serviceProvider);
+                return cmd.Invoke(serviceProvider, null);
             }
             else
             {

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Linq;
 using Jasily.Frameworks.Cli.Commands;
-using Jasily.Frameworks.Cli.Configures;
+using Jasily.Frameworks.Cli.Configurations;
 
 namespace Jasily.Frameworks.Cli.Attributes
 {
-    public abstract class BaseCommandAttribute : Attribute, IConfigureableAttribute<IApiCommandBuilder>,
-        IConfigureableAttribute<INameConfiguration>
+    public abstract class BaseCommandAttribute : Attribute,
+        IConfigureableAttribute<INameConfigurator>
     {
         /// <summary>
         /// name for command.
@@ -18,26 +18,16 @@ namespace Jasily.Frameworks.Cli.Attributes
         /// </summary>
         public bool IgnoreDeclaringName { get; set; }
 
-        /// <summary>
-        /// apply attribute to command.
-        /// </summary>
-        /// <param name="api"></param>
-        public void Apply(IApiCommandBuilder api)
-        {
-            if (this.Names != null)
-            {
-                foreach (var name in this.Names)
-                {
-                    api.AddName(name);
-                }
-            }
-        }
-
-        public void Apply(INameConfiguration configuration)
+        public void Apply(INameConfigurator configurator)
         {
             foreach (var name in this.Names ?? Enumerable.Empty<string>())
             {
-                configuration.AddName(name);
+                configurator.AddName(name);
+            }
+
+            if (this.IgnoreDeclaringName)
+            {
+                configurator.IgnoreDeclaringName();
             }
         }
     }
