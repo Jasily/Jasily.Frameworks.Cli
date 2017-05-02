@@ -35,7 +35,7 @@ namespace Jasily.Frameworks.Cli.Commands
         {
             var comparer = provider.GetRequiredService<StringComparer>();
 
-            if ((this._instances?.Count ?? 0) == 0)
+            if (this._instances == null || this._instances.Count == 0)
             {
                 return new CommandRouter(comparer, Enumerable.Empty<ICommand>());
             }

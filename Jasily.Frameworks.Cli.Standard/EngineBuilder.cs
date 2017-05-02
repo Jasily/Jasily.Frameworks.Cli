@@ -21,37 +21,6 @@ namespace Jasily.Frameworks.Cli
     /// </summary>
     public class EngineBuilder
     {
-        private struct Element
-        {
-            private bool _isType;
-            private Type _type;
-            private object _instance;
-
-            public static Element CreateTypeElement(Type type)
-            {
-                return new Element()
-                {
-                    _isType = true,
-                    _type = type
-                };
-            }
-
-            public static Element CreateInstanceElement(object instance)
-            {
-                return new Element()
-                {
-                    _isType = false,
-                    _instance = instance
-                };
-            }
-
-            public object GetValue(IServiceProvider provider)
-            {
-                return this._isType ? provider.GetRequiredService(this._type) : this._instance;
-            }
-        }
-
-        private readonly List<Element> _types = new List<Element>();
         private readonly ServiceCollection _services = new ServiceCollection();
         private readonly AutoResolvedTypes _autoResolvedTypes = new AutoResolvedTypes();
 
@@ -65,6 +34,7 @@ namespace Jasily.Frameworks.Cli
 
             // internal
             this._services.AddSingleton(typeof(TypeConfiguration<>));
+            this._services.AddSingleton<HelpCommandsConfiguration>();
 
             // base
             this._services.AddSingleton(StringComparer.OrdinalIgnoreCase);
@@ -176,11 +146,13 @@ namespace Jasily.Frameworks.Cli
         internal IEngine Build(out IServiceProvider serviceProvider)
         {
             this._services.AddSingleton(this._autoResolvedTypes.Clone());
-            var provider = this._services.BuildServiceProvider();            
-            var engine = (Engine)provider.GetRequiredService<IEngine>();
-            var builder = new CommandRouterBuilder(this._types.Select(z => z.GetValue(provider)).ToArray());
+            var provider = this._services.BuildServiceProvider();
             serviceProvider = provider;
-            return engine.Initialize(builder.Build(provider));
+            var hcc = serviceProvider.GetRequiredService<HelpCommandsConfiguration>();
+            hcc.Commands.Add("-h");
+            hcc.Commands.Add("help");
+            hcc.Commands.Add("/?");
+            return provider.GetRequiredService<IEngine>();
         }
 
         /// <summary>

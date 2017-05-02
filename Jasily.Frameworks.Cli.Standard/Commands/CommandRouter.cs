@@ -67,8 +67,12 @@ namespace Jasily.Frameworks.Cli.Commands
                                 return true;
                             }
 
-                            serviceProvider.GetRequiredService<IOutputer>()
-                                .WriteLine(OutputLevel.Error, $"unknown command <{name}>");
+                            var hcc = serviceProvider.GetRequiredService<HelpCommandsConfiguration>();
+                            if (!hcc.Commands.Contains(name))
+                            {
+                                serviceProvider.GetRequiredService<IOutputer>()
+                                    .WriteLine(OutputLevel.Error, $"Unknown Command: <{name}>");
+                            }
                         }
                         command = default(ICommand);
                         return false;
