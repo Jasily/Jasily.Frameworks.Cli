@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Jasily.DependencyInjection.AwaiterAdapter;
 using Jasily.DependencyInjection.MethodInvoker;
 using Jasily.Frameworks.Cli.Attributes;
 using Jasily.Frameworks.Cli.Core;
@@ -56,7 +57,7 @@ namespace Jasily.Frameworks.Cli.Commands
 
         public bool IgnoreDeclaringName => this.ignoreDeclaringName && this.names.Count > 0;
 
-        public virtual object Invoke(IServiceProvider serviceProvider, [NotNull] object instance)
+        public object Invoke(IServiceProvider serviceProvider, [NotNull] object instance)
         {
             if (serviceProvider == null) throw new ArgumentNullException(nameof(serviceProvider));
             if (instance == null) throw new ArgumentNullException(nameof(instance));
@@ -107,17 +108,15 @@ namespace Jasily.Frameworks.Cli.Commands
             {
                 return value;
             }
-            else if (value != null && value.GetType().GetTypeInfo().GetCustomAttribute<CommandClassAttribute>() != null)
+            if (value?.GetType().GetTypeInfo().GetCustomAttribute<CommandClassAttribute>() != null)
             {
                 session.Argv.Grouped();
                 var router = new CommandRouterBuilder(value)
                     .Build(serviceProvider.GetRequiredService<IServiceProvider>());
                 return router.Execute(serviceProvider);
             }
-            else
-            {
-                throw UnknownArgumentsException.Build(session);
-            }
+
+            return session.UnknownArguments<object>();
         }
 
         public abstract OverrideArguments ResolveArguments(IServiceProvider serviceProvider, IArgumentList args);

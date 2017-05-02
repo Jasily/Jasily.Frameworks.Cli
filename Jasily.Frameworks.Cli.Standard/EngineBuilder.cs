@@ -11,6 +11,7 @@ using Jasily.Frameworks.Cli.Attributes;
 using Jasily.Frameworks.Cli.Commands;
 using JetBrains.Annotations;
 using System.Collections.Generic;
+using Jasily.DependencyInjection.AwaiterAdapter;
 using Jasily.Frameworks.Cli.Configures;
 
 namespace Jasily.Frameworks.Cli
@@ -59,6 +60,7 @@ namespace Jasily.Frameworks.Cli
         {
             var sc = this.Services;
             sc.UseMethodInvoker();
+            sc.UseAwaiterAdapter();
 
             // internal
             sc.AddSingleton(typeof(TypeConfigure<>));

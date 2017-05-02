@@ -4,58 +4,74 @@ using System.Collections.Generic;
 using Jasily.Frameworks.Cli.Attributes;
 using System.Collections.Concurrent;
 using Microsoft.Extensions.DependencyInjection;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Jasily.Frameworks.Cli.Configures
 {
     internal class TypeConfigure<TClass> : ITypeConfigure
     {
-        private readonly IServiceProvider serviceProvider;
-        private readonly HashSet<Type> inheritedTypes = new HashSet<Type>();
-        private readonly ConcurrentDictionary<Type, ITypeConfigure> inheritedsConfigures
+        private readonly IServiceProvider _serviceProvider;
+        private readonly HashSet<Type> _inheritedTypes = new HashSet<Type>();
+        private readonly ConcurrentDictionary<Type, ITypeConfigure> _inheritedsConfigures
             = new ConcurrentDictionary<Type, ITypeConfigure>();
-        private readonly HashSet<PropertyInfo> properties = new HashSet<PropertyInfo>();
-        private readonly ConcurrentDictionary<PropertyInfo, PropertyConfigure> propertiesConfigures
+        private readonly HashSet<PropertyInfo> _properties = new HashSet<PropertyInfo>();
+        private readonly ConcurrentDictionary<PropertyInfo, PropertyConfigure> _propertiesConfigures
             = new ConcurrentDictionary<PropertyInfo, PropertyConfigure>();
 
         public TypeConfigure(IServiceProvider serviceProvider)
         {
-            this.serviceProvider = serviceProvider;
-            this.properties = new HashSet<PropertyInfo>(typeof(TClass).GetRuntimeProperties());
+            // init fields
+            this._serviceProvider = serviceProvider;
+            this._properties = new HashSet<PropertyInfo>(typeof(TClass).GetRuntimeProperties());
 
-            var t = typeof(TClass);
-            while (this.inheritedTypes.Add(t = t?.GetTypeInfo().BaseType)) { }
-            this.inheritedTypes.Remove(null);
+            // init properties
+            this.TypeInfo = this.Type.GetTypeInfo();
 
-            // load configure
-            if (typeof(TClass).GetTypeInfo().GetCustomAttribute<CommandClassAttribute>() is
-                CommandClassAttribute classAttribute)
+            var n = new NameConfiguration();
+            foreach (var attrubute in this.TypeInfo.GetCustomAttributes())
             {
-                this.HasCommandClassAttribute = true;
+                if (attrubute is CommandClassAttribute)
+                {
+                    this.HasCommandClassAttribute = true;
+                }
+
+                (attrubute as IConfigureableAttribute<INameConfiguration>)?.Apply(n);
             }
+            this.Names = n.Names.ToArray().AsReadOnly();
+
+            // load inherited
+            var t = typeof(TClass);
+            while (this._inheritedTypes.Add(t = t?.GetTypeInfo().BaseType)) { }
+            this._inheritedTypes.Remove(null);
         }
 
         public Type Type { get; } = typeof(TClass);
 
+        public TypeInfo TypeInfo { get; }
+
         public bool HasCommandClassAttribute { get; }
+
+        public IReadOnlyList<string> Names { get; }
 
         #region ITypeConfigure
 
         public ITypeConfigure GetInheritedTypeConfigure(Type declaringType)
         {
             if (declaringType == this.Type) return this;
-            if (!this.inheritedTypes.Contains(declaringType)) throw new InvalidOperationException();
+            if (!this._inheritedTypes.Contains(declaringType)) throw new InvalidOperationException();
 
-            if (this.inheritedsConfigures.TryGetValue(declaringType, out var c)) return c;
+            if (this._inheritedsConfigures.TryGetValue(declaringType, out var c)) return c;
             var configure = (ITypeConfigure)
-                this.serviceProvider.GetRequiredService(typeof(TypeConfigure<>).MakeGenericType(declaringType));
-            return this.inheritedsConfigures.GetOrAdd(declaringType, configure);
+                this._serviceProvider.GetRequiredService(typeof(TypeConfigure<>).MakeGenericType(declaringType));
+            return this._inheritedsConfigures.GetOrAdd(declaringType, configure);
         }
 
         public IPropertyConfigure GetConfigure(PropertyInfo property)
         {
-            if (!this.properties.Contains(property)) throw new InvalidOperationException();
+            if (!this._properties.Contains(property)) throw new InvalidOperationException();
 
-            if (this.propertiesConfigures.TryGetValue(property, out var r))
+            if (this._propertiesConfigures.TryGetValue(property, out var r))
             {
                 return r;
             }
@@ -66,7 +82,7 @@ namespace Jasily.Frameworks.Cli.Configures
             }
             else
             {
-                return this.propertiesConfigures.GetOrAdd(property, (_) => new PropertyConfigure(this.serviceProvider, property));
+                return this._propertiesConfigures.GetOrAdd(property, (_) => new PropertyConfigure(this._serviceProvider, property));
             }
         }
 
@@ -74,11 +90,11 @@ namespace Jasily.Frameworks.Cli.Configures
 
         internal class PropertyConfigure : IPropertyConfigure
         {
-            private readonly IServiceProvider serviceProvider;
+            private readonly IServiceProvider _serviceProvider;
 
             public PropertyConfigure(IServiceProvider serviceProvider, PropertyInfo property)
             {
-                this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+                this._serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
                 this.Property = property ?? throw new ArgumentNullException(nameof(property));
 
                 if (property.GetCustomAttribute<CommandPropertyAttribute>() is CommandPropertyAttribute propertyAttribute)
@@ -94,11 +110,11 @@ namespace Jasily.Frameworks.Cli.Configures
 
         internal class ParameterAttribute
         {
-            private readonly IServiceProvider serviceProvider;
+            private readonly IServiceProvider _serviceProvider;
 
             public ParameterAttribute(IServiceProvider serviceProvider, ParameterInfo parameter)
             {
-
+                this._serviceProvider = serviceProvider;
             }
         }
     }

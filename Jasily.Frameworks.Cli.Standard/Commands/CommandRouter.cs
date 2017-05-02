@@ -41,12 +41,15 @@ namespace Jasily.Frameworks.Cli.Commands
 
         public object Execute(IServiceProvider serviceProvider)
         {
+            var session = serviceProvider.GetRequiredService<ISession>();
+
             bool TryResolve(IArgumentList args, out ICallableCommand command)
             {
                 switch (this.Commands.Count)
                 {
                     case 0:
-                        throw new NotImplementedException();
+                        command = default(ICallableCommand);
+                        return session.UnknownArguments<bool>();
 
                     case 1:
                         command = this.Commands.Single();
@@ -68,8 +71,7 @@ namespace Jasily.Frameworks.Cli.Commands
                         return false;
                 }
             }
-
-            var session = serviceProvider.GetRequiredService<ISession>();            
+                        
             if (TryResolve(session.Argv, out var cmd))
             {
                 return cmd.Invoke(serviceProvider);

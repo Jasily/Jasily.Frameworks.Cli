@@ -10,8 +10,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Jasily.DependencyInjection.MemberInjection.Standard" Version="0.0.1" />
-    <PackageReference Include="Jasily.DependencyInjection.MethodInvoker.Standard" Version="0.0.1.3" />
+    <PackageReference Include="Jasily.DependencyInjection.AwaiterAdapter.Standard" Version="0.0.0.2" />
+    <PackageReference Include="Jasily.DependencyInjection.MethodInvoker.Standard" Version="0.0.1.5" />
+    <PackageReference Include="Jasily.Extensions.System" Version="0.0.0.1" />
     <PackageReference Include="JetBrains.Annotations" Version="10.4.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="1.1.0" />
   </ItemGroup>

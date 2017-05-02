@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Linq;
 using Jasily.Frameworks.Cli.Commands;
+using Jasily.Frameworks.Cli.Configures;
 
 namespace Jasily.Frameworks.Cli.Attributes
 {
-    public abstract class BaseCommandAttribute : Attribute
+    public abstract class BaseCommandAttribute : Attribute, IConfigureableAttribute<IApiCommandBuilder>,
+        IConfigureableAttribute<INameConfiguration>
     {
         /// <summary>
         /// name for command.
@@ -19,7 +22,7 @@ namespace Jasily.Frameworks.Cli.Attributes
         /// apply attribute to command.
         /// </summary>
         /// <param name="api"></param>
-        public virtual void Apply(IApiCommandBuilder api)
+        public void Apply(IApiCommandBuilder api)
         {
             if (this.Names != null)
             {
@@ -27,6 +30,14 @@ namespace Jasily.Frameworks.Cli.Attributes
                 {
                     api.AddName(name);
                 }
+            }
+        }
+
+        public void Apply(INameConfiguration configuration)
+        {
+            foreach (var name in this.Names ?? Enumerable.Empty<string>())
+            {
+                configuration.AddName(name);
             }
         }
     }

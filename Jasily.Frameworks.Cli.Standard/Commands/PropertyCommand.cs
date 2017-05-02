@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Reflection;
 using Jasily.DependencyInjection.MethodInvoker;
-using Jasily.DependencyInjection.MemberInjection;
 using Jasily.Frameworks.Cli.Attributes;
 
 namespace Jasily.Frameworks.Cli.Commands

@@ -13,7 +13,7 @@ namespace Jasily.Frameworks.Cli.Commands
         private readonly HashSet<string> nameSet;
         private readonly Dictionary<string, string> boolMap;
 
-        public ParameterInfoDescriptor(ParameterInfo parameter, StringComparer comaprer)
+        internal ParameterInfoDescriptor(ParameterInfo parameter, StringComparer comaprer)
         {
             this.ParameterInfo = parameter;
             this.stringComparer = comaprer;
