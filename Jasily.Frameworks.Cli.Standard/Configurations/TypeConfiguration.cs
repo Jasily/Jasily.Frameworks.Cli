@@ -105,11 +105,8 @@ namespace Jasily.Frameworks.Cli.Configurations
 
         internal class PropertyConfiguration : IPropertyConfiguration
         {
-            private readonly TypeConfiguration<TClass> _typeConfiguration;
-
             public PropertyConfiguration(TypeConfiguration<TClass> typeConfiguration, PropertyInfo property)
             {
-                this._typeConfiguration = typeConfiguration;
                 this.ServiceProvider = typeConfiguration._serviceProvider;
                 this.Property = property ?? throw new ArgumentNullException(nameof(property));
 
@@ -138,6 +135,8 @@ namespace Jasily.Frameworks.Cli.Configurations
             {
                 // only create public method getter
                 if (!this.Property.CanRead || !this.Property.GetMethod.IsPublic) return null;
+                // NOT static
+                if (this.Property.GetMethod.IsStatic) return null;
                 // only create NOT INDEX method
                 if (this.Property.GetIndexParameters().Length > 0) return null;
                 // inherit method will not create
@@ -152,11 +151,8 @@ namespace Jasily.Frameworks.Cli.Configurations
 
         internal class MethodConfiguration : IMethodConfiguration
         {
-            private readonly TypeConfiguration<TClass> _typeConfiguration;
-
             public MethodConfiguration(TypeConfiguration<TClass> typeConfiguration, MethodInfo method)
             {
-                this._typeConfiguration = typeConfiguration;
                 this.ServiceProvider = typeConfiguration._serviceProvider;
                 this.Method = method ?? throw new ArgumentNullException(nameof(method));
 
@@ -184,7 +180,7 @@ namespace Jasily.Frameworks.Cli.Configurations
             [CanBeNull]
             public BaseCommand TryMakeCommand(Type type)
             {
-                if (!this.Method.IsPublic)
+                if (!this.Method.IsPublic || this.Method.IsStatic)
                 {
                     return null;
                 }
