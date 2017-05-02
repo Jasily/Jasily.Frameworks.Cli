@@ -42,18 +42,26 @@ namespace Jasily.Frameworks.Cli.Tests
             public string[] Array(string[] value) => value;
 
             public string[] ParamsArray(params string[] value) => value;
+
+            public int[] Int32Array(int[] value) => value;
+
+            public int[] Int32ParamsArray(params int[] value) => value;
         }
 
         [TestMethod]
         public void TypeShouldConvertCorrect()
         {
-            var engine = this.Fire(new CommandClass(), out var sb);
-            Assert.AreEqual(5, engine.Execute(new[] { nameof(CommandClass.Int32), "5" }));
-            Assert.AreEqual((uint)5, engine.Execute(new[] { nameof(CommandClass.UInt32), "5" }));
-            Assert.AreEqual((long)5, engine.Execute(new[] { nameof(CommandClass.Int64), "5" }));
-            Assert.AreEqual((ulong)5, engine.Execute(new[] { nameof(CommandClass.UInt64), "5" }));
-            Assert.AreEqual((float)5, engine.Execute(new[] { nameof(CommandClass.Single), "5" }));
-            Assert.AreEqual((double)5, engine.Execute(new[] { nameof(CommandClass.Double), "5" }));
+            var executor = this.Fire(new CommandClass(), out var sb);
+            Assert.AreEqual(5, executor.Execute(new[] { nameof(CommandClass.Int32), "5" }));
+            Assert.AreEqual((uint)5, executor.Execute(new[] { nameof(CommandClass.UInt32), "5" }));
+            Assert.AreEqual((long)5, executor.Execute(new[] { nameof(CommandClass.Int64), "5" }));
+            Assert.AreEqual((ulong)5, executor.Execute(new[] { nameof(CommandClass.UInt64), "5" }));
+            Assert.AreEqual((float)5, executor.Execute(new[] { nameof(CommandClass.Single), "5" }));
+            Assert.AreEqual((double)5, executor.Execute(new[] { nameof(CommandClass.Double), "5" }));
+            CollectionAssert.AreEqual(new[] { "5", "8" }, (string[]) executor.Execute(new[] { nameof(CommandClass.Array), "5", "8" }));
+            CollectionAssert.AreEqual(new[] { "5", "8" }, (string[]) executor.Execute(new[] { nameof(CommandClass.ParamsArray), "5", "8" }));
+            CollectionAssert.AreEqual(new[] { 5, 8 }, (int[])executor.Execute(new[] { nameof(CommandClass.Int32Array), "5", "8" }));
+            CollectionAssert.AreEqual(new[] { 5, 8 }, (int[])executor.Execute(new[] { nameof(CommandClass.Int32ParamsArray), "5", "8" }));
         }
 
         [TestMethod]
