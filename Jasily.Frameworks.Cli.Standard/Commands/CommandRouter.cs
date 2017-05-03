@@ -52,37 +52,29 @@ namespace Jasily.Frameworks.Cli.Commands
         {
             var args = session.Argv;
 
-            switch (this.Commands.Count)
+            if (this.Commands.Count == 0) return session.UnknownArguments<ICommand>();
+
+            if (args.TryGetNextArgument(out var name))
             {
-                case 0:
-                    return session.UnknownArguments<ICommand>();
+                if (this.CommandsMap.TryGetValue(name, out var command))
+                {
+                    args.UseOne();
+                    return command;
+                }
 
-                case 1:
-                    return this.Commands.Single();
-
-                default:
-                    if (args.TryGetNextArgument(out var name))
-                    {
-                        if (this.CommandsMap.TryGetValue(name, out var command))
-                        {
-                            args.UseOne();
-                            return command;
-                        }
-
-                        if (args.Argv.Count - args.UsedArgvCount == 1 &&
-                            serviceProvider.GetRequiredService<HelpCommandsConfiguration>().Commands.Contains(name))
-                        {
-                            // ignore.
-                        }
-                        else
-                        {
-                            return session.UnknownCommand<ICommand>();
-                        }
-                    }
-                    session.DrawUsage();
-                    session.Termination();
-                    return null;
+                if (args.Argv.Count - args.UsedArgvCount == 1 &&
+                    serviceProvider.GetRequiredService<HelpCommandsConfiguration>().Commands.Contains(name))
+                {
+                    // ignore.
+                }
+                else
+                {
+                    return session.UnknownCommand<ICommand>();
+                }
             }
+            session.DrawUsage();
+            session.Termination();
+            return null;
         }
     }
 }
