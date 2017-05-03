@@ -33,8 +33,7 @@ namespace Jasily.Frameworks.Cli.Commands
         {
             if (serviceProvider == null) throw new ArgumentNullException(nameof(serviceProvider));
             if (instance == null) throw new ArgumentNullException(nameof(instance));
-            var session = (Session) serviceProvider.GetRequiredService<ISession>();
-            session.AddCommand(this);
+            var session = serviceProvider.GetRequiredService<ISession>();
 
             OverrideArguments GetArguments()
             {

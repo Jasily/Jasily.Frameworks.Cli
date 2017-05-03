@@ -25,9 +25,9 @@ namespace Jasily.Frameworks.Cli.Commands
             {
                 foreach (var name in cmd.Properties.Names)
                 {
-                    if (map.TryGetValue(name, out var x) && x != cmd)
+                    if (map.TryGetValue(name, out var x))
                     {
-                        if (x != cmd) throw new InvalidOperationException();
+                        if (!x.Equals(cmd)) throw new InvalidOperationException();
                     }
                     else
                     {
@@ -46,7 +46,9 @@ namespace Jasily.Frameworks.Cli.Commands
         {
             var session = (Session) serviceProvider.GetRequiredService<ISession>();
             session.AddRouter(this);
-            return this.ResolveCommand(serviceProvider, session).Invoke(serviceProvider);
+            var command = this.ResolveCommand(serviceProvider, session);
+            session.AddCommand(command.InnerCommand);
+            return command.Invoke(serviceProvider);
         }
 
         private BindedCommand ResolveCommand(IServiceProvider serviceProvider, ISession session)
@@ -75,7 +77,8 @@ namespace Jasily.Frameworks.Cli.Commands
             }
 
             session.DrawUsage();
-            return null;
+            session.Termination();
+            return default(BindedCommand);
         }
 
         internal static CommandRouter Build(IServiceProvider provider, object instance)

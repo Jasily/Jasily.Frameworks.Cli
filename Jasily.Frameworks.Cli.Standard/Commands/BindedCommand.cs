@@ -9,22 +9,25 @@ namespace Jasily.Frameworks.Cli.Commands
     /// <summary>
     /// provide binded instance command wrapper.
     /// </summary>
-    internal class BindedCommand
+    internal struct BindedCommand : IEquatable<BindedCommand>
     {
-        private readonly object _instance;
-        private readonly ICommand _innerCommand;
-
         public BindedCommand([NotNull] ICommand innerCommand, [NotNull] object instance)
         {
-            this._innerCommand = innerCommand ?? throw new ArgumentNullException(nameof(innerCommand));
-            this._instance = instance ?? throw new ArgumentNullException(nameof(instance));
+            this.InnerCommand = innerCommand ?? throw new ArgumentNullException(nameof(innerCommand));
+            this.Instance = instance ?? throw new ArgumentNullException(nameof(instance));
         }
+
+        public object Instance { get; }
 
         public object Invoke(IServiceProvider serviceProvider)
         {
-            return this._innerCommand.Invoke(serviceProvider, this._instance);
+            return this.InnerCommand.Invoke(serviceProvider, this.Instance);
         }
 
-        public ICommandProperties Properties => this._innerCommand.Properties;
+        public bool Equals(BindedCommand other) => this.InnerCommand == other.InnerCommand;
+
+        public ICommand InnerCommand { get; }
+
+        public ICommandProperties Properties => this.InnerCommand.Properties;
     }
 }

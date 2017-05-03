@@ -39,9 +39,6 @@ namespace Jasily.Frameworks.Cli
             // base
             this._services.AddSingleton(StringComparer.OrdinalIgnoreCase);
 
-            // mapper
-            this._services.AddSingleton(typeof(ClassCommand<>));
-
             // core
             this.AddAutoResolvedSingleton<IEngine, Engine>();
             this.AddAutoResolvedScoped<ISession, Session>();

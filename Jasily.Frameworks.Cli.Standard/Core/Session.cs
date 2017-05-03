@@ -13,7 +13,7 @@ namespace Jasily.Frameworks.Cli.Core
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly List<CommandRouter> _routers = new List<CommandRouter>();
-        private BaseCommand _command;
+        private ICommand _command;
 
         public Session(IServiceProvider serviceProvider)
         {
@@ -54,7 +54,7 @@ namespace Jasily.Frameworks.Cli.Core
             this._routers.Add(router);
         }
 
-        public void AddCommand(BaseCommand command)
+        public void AddCommand(ICommand command)
         {
             this._command = command;
         }
