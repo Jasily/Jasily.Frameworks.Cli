@@ -8,5 +8,7 @@ namespace Jasily.Frameworks.Cli.Configurations
     internal interface ITypeConfiguration : ICommandConfiguration
     {
         IReadOnlyList<ICommand> AvailableCommands { get; }
+
+        bool CanBeResult { get; }
     }
 }

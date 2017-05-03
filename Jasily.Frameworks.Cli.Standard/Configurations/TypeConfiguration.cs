@@ -35,6 +35,7 @@ namespace Jasily.Frameworks.Cli.Configurations
             var attributes = this.TypeInfo.GetCustomAttributes().ToArray();
             this.Names = CreateNameList(attributes, this.Type.Name);
             this.IsDefinedCommand = attributes.OfType<CommandClassAttribute>().FirstOrDefault() != null;
+            this.Configure(attributes);
 
             // load inherited class
             var t = typeof(TClass);
@@ -54,11 +55,21 @@ namespace Jasily.Frameworks.Cli.Configurations
                 .ToDictionary(z => z.Method);
         }
 
+        private void Configure(IEnumerable<Attribute> attributes)
+        {
+            var configurator = new CommandClassConfigurator();
+            attributes.OfType<IConfigureableAttribute<ICommandClassConfigurator>>()
+                .ForEach(z => z.Apply(configurator));
+            this.CanBeResult = !configurator.IsNotResult;
+        }
+
         public Type Type { get; } = typeof(TClass);
 
         public TypeInfo TypeInfo { get; }
 
         public bool IsDefinedCommand { get; }
+
+        public bool CanBeResult { get; private set; }
 
         public IReadOnlyList<string> Names { get; }
 

@@ -7,9 +7,19 @@ namespace Jasily.Frameworks.Cli.Exceptions
     /// <summary>
     /// 
     /// </summary>
-    public sealed class UnknownArgumentsException : ArgumentsException
+    internal sealed class UnknownArgumentsException : ArgumentsException
     {
         internal UnknownArgumentsException(string message) : base(message)
+        {
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    internal sealed class UnknownCommandException : ArgumentsException
+    {
+        internal UnknownCommandException(string message) : base(message)
         {
         }
     }

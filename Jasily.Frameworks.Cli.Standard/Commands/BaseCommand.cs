@@ -67,27 +67,40 @@ namespace Jasily.Frameworks.Cli.Commands
             }
             var value  = InternalInvoke();
 
-            // wait for task
+            // wait for any kind task
             if (value != null)
             {
                 value = serviceProvider.GetValueOrAwaitableResult(value, true);
             }
+
+            object ContinueExecute()
+            {
+                session.Argv.Grouped();
+                var router = new CommandRouterBuilder(value).Build(serviceProvider);
+                return router.Execute(serviceProvider);
+            }
+
+            if (value != null)
+            {
+                var type = typeof(TypeConfiguration<>).FastMakeGenericType(value.GetType());
+                var configuration = (ITypeConfiguration) serviceProvider.GetRequiredService(type);
+
+                if (!configuration.CanBeResult)
+                {
+                    return ContinueExecute();
+                }
+
+                if (!session.Argv.IsAllUsed() && configuration.IsDefinedCommand)
+                {
+                    return ContinueExecute();
+                }
+            }
+
             if (session.Argv.IsAllUsed())
             {
                 return value;
             }
-            if (value != null)
-            {
-                if (((ITypeConfiguration) serviceProvider.GetRequiredService(
-                        typeof(TypeConfiguration<>).FastMakeGenericType(value.GetType()))
-                    ).IsDefinedCommand)
-                {
-                    session.Argv.Grouped();
-                    var router = new CommandRouterBuilder(value)
-                        .Build(serviceProvider.GetRequiredService<IServiceProvider>());
-                    return router.Execute(serviceProvider);
-                }
-            }
+
             return session.UnknownArguments<object>();
         }
 

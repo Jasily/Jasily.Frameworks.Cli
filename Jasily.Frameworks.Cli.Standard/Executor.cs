@@ -33,7 +33,7 @@ namespace Jasily.Frameworks.Cli
                 throw new InvalidOperationException($"{nameof(Executor)} should Create by {nameof(Engine)}.");
             }
 
-            using (var s = ServiceProviderServiceExtensions.CreateScope(this._engint.ServiceProvider))
+            using (var s = this._engint.ServiceProvider.CreateScope())
             {
                 var session = (Session)s.ServiceProvider.GetRequiredService<ISession>();
                 session.OriginalArgv = new ReadOnlyCollection<string>(argv);
@@ -45,8 +45,9 @@ namespace Jasily.Frameworks.Cli
                     var value = this._routerRoot.Execute(s.ServiceProvider);
                     if (value != null)
                     {
-                        var formater = ServiceProviderServiceExtensions.GetRequiredService<IValueFormater>(this._engint.ServiceProvider);
-                        ServiceProviderServiceExtensions.GetRequiredService<IOutputer>(this._engint.ServiceProvider).WriteLine(OutputLevel.Normal, formater.Format(value));
+                        var formater = this._engint.ServiceProvider.GetRequiredService<IValueFormater>();
+                        this._engint.ServiceProvider.GetRequiredService<IOutputer>()
+                            .WriteLine(OutputLevel.Normal, formater.Format(value));
                     }
                     return value;
                 }
@@ -56,20 +57,28 @@ namespace Jasily.Frameworks.Cli
                 }
                 catch (CliException e)
                 {
-                    ServiceProviderServiceExtensions.GetRequiredService<IOutputer>(this._engint.ServiceProvider).WriteLine(OutputLevel.Error, e.Message);
+                    if (e.Message.Length > 0)
+                    {
+                        this._engint.ServiceProvider.GetRequiredService<IOutputer>()
+                            .WriteLine(OutputLevel.Error, e.Message);
+                    }
+                    
                     session.DrawUsage();
                 }
                 catch (NotImplementedException e)
                 {
-                    ServiceProviderServiceExtensions.GetRequiredService<IOutputer>(this._engint.ServiceProvider).WriteLine(OutputLevel.Error, e.ToString());
+                    this._engint.ServiceProvider.GetRequiredService<IOutputer>()
+                        .WriteLine(OutputLevel.Error, e.ToString());
                 }
                 catch (InvalidOperationException e)
                 {
-                    ServiceProviderServiceExtensions.GetRequiredService<IOutputer>(this._engint.ServiceProvider).WriteLine(OutputLevel.Error, e.Message);
+                    this._engint.ServiceProvider.GetRequiredService<IOutputer>()
+                        .WriteLine(OutputLevel.Error, e.Message);
                 }
                 catch (Exception e)
                 {
-                    ServiceProviderServiceExtensions.GetRequiredService<IOutputer>(this._engint.ServiceProvider).WriteLine(OutputLevel.Error, e.ToString());
+                    this._engint.ServiceProvider.GetRequiredService<IOutputer>()
+                        .WriteLine(OutputLevel.Error, e.ToString());
                 }
             }
 
