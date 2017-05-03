@@ -34,7 +34,7 @@ namespace Jasily.Frameworks.Cli.Core
             }
             else
             {
-                drawer.DrawRouter(this._routers.Last());
+                drawer.DrawRouter(this._routers.Last().CommandsProperties);
             }
         }
 

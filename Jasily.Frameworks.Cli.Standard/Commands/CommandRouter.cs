@@ -11,11 +11,10 @@ using Jasily.Frameworks.Cli.Exceptions;
 
 namespace Jasily.Frameworks.Cli.Commands
 {
-    internal class CommandRouter : ICommandRouter
+    internal struct CommandRouter
     {
         private readonly IReadOnlyCollection<BindedCommand> _commands;
         private readonly IReadOnlyDictionary<string, BindedCommand> _commandsMap;
-        private readonly IReadOnlyCollection<ICommandProperties> _commandProperties;
 
         private CommandRouter(StringComparer comparer, IEnumerable<BindedCommand> commands)
         {
@@ -37,10 +36,10 @@ namespace Jasily.Frameworks.Cli.Commands
                 }
             }
             this._commandsMap = map;
-            this._commandProperties = this._commands.Select(z => z.Properties).ToArray().AsReadOnly();
+            this.CommandsProperties = this._commands.Select(z => z.Properties).ToArray().AsReadOnly();
         }
 
-        IReadOnlyCollection<ICommandProperties> ICommandRouter.Commands => this._commandProperties;
+        public IReadOnlyCollection<ICommandProperties> CommandsProperties { get; }
 
         public object Execute(IServiceProvider serviceProvider)
         {

@@ -13,7 +13,7 @@ namespace Jasily.Frameworks.Cli.IO
         /// draw router.
         /// </summary>
         /// <param name="router"></param>
-        void DrawRouter(ICommandRouter router);
+        void DrawRouter(IReadOnlyCollection<ICommandProperties> commands);
 
         /// <summary>
         /// draw router.

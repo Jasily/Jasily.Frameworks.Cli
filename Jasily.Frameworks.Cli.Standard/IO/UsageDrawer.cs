@@ -15,12 +15,12 @@ namespace Jasily.Frameworks.Cli.IO
             this.outputer = outputer;
         }
 
-        public void DrawRouter(ICommandRouter router)
+        public void DrawRouter(IReadOnlyCollection<ICommandProperties> commands)
         {
             this.outputer.WriteLine(OutputLevel.Usage, "Usage:");
-            this.outputer.WriteLine(OutputLevel.Usage, "   Commands:");
+            this.outputer.WriteLine(OutputLevel.Usage, "   CommandsProperties:");
             var sb = new StringBuilder();
-            foreach (var cmd in router.Commands)
+            foreach (var cmd in commands)
             {
                 sb.Clear();
                 var names = new Queue<string>();
@@ -38,7 +38,7 @@ namespace Jasily.Frameworks.Cli.IO
         public void DrawParameter(ICommandProperties command, IReadOnlyList<IParameterProperties> parameters)
         {
             this.outputer.WriteLine(OutputLevel.Usage, "Usage:");
-            this.outputer.WriteLine(OutputLevel.Usage, $"   Parameters of Commands <{command.Names[0]}>:");
+            this.outputer.WriteLine(OutputLevel.Usage, $"   Parameters of CommandsProperties <{command.Names[0]}>:");
             var sb = new StringBuilder();
             foreach (var parameter in parameters)
             {
