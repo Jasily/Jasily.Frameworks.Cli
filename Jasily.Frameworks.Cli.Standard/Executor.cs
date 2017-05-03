@@ -30,7 +30,7 @@ namespace Jasily.Frameworks.Cli
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="InvalidOperationException"></exception>
         /// <returns></returns>
-        public Executor Execute([NotNull, ItemNotNull] string[] argv)
+        public Executor Execute([NotNull, ItemNotNull] string[] argv, ExecuteMode mode = ExecuteMode.Default)
         {
             if (argv == null) throw new ArgumentNullException(nameof(argv));
             if (argv.Any(string.IsNullOrEmpty))
@@ -50,11 +50,12 @@ namespace Jasily.Frameworks.Cli
 
             using (var s = this._engine.ServiceProvider.CreateScope())
             {
-                var session = (Session)s.ServiceProvider.GetRequiredService<ISession>();
-                session.OriginalArgv = new ReadOnlyCollection<string>(argv);
-                var args = (ArgumentList)s.ServiceProvider.GetRequiredService<IArgumentList>();
-                args.SetArgv(argv);
-                session.Argv = args;
+                var configurator = s.ServiceProvider.GetRequiredService<SessionConfigurator>();
+                configurator.Argv = argv;
+                configurator.Mode = mode;
+
+                var session = (Session)s.ServiceProvider.GetRequiredService<ISession>(); // init session.
+
                 try
                 {
                     var value = router.Execute(s.ServiceProvider);
@@ -66,10 +67,7 @@ namespace Jasily.Frameworks.Cli
                     }
                     return new Executor(this._engine, value);
                 }
-                catch (TerminationException)
-                {
-                    // ignore.
-                }
+                catch (TerminationException) { /* ignore. */ }
                 catch (CliException e)
                 {
                     if (e.Message.Length > 0)
@@ -77,7 +75,6 @@ namespace Jasily.Frameworks.Cli
                         this._engine.ServiceProvider.GetRequiredService<IOutputer>()
                             .WriteLine(OutputLevel.Error, e.Message);
                     }
-                    
                     session.DrawUsage();
                 }
                 catch (NotImplementedException e)

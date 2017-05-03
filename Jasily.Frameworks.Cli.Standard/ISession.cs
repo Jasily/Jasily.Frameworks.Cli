@@ -8,7 +8,7 @@ namespace Jasily.Frameworks.Cli
     /// </summary>
     public interface ISession : IDisposable
     {
-        IReadOnlyList<string> OriginalArgv { get; }
+        ExecuteMode ExecuteMode { get; }
 
         IArgumentList Argv { get; }
 

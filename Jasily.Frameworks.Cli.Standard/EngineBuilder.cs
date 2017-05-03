@@ -42,6 +42,7 @@ namespace Jasily.Frameworks.Cli
             // core
             this.AddAutoResolvedSingleton<IEngine, Engine>();
             this.AddAutoResolvedScoped<ISession, Session>();
+            this._services.AddScoped<SessionConfigurator>();
             this._services.AddScoped<IArgumentList, ArgumentList>();
             this.AddAutoResolvedTransient<IOutputer, Outputer>();
 

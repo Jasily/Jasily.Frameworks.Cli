@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Jasily.Frameworks.Cli.Commands;
 using Jasily.Frameworks.Cli.Configurations;
 using Jasily.Frameworks.Cli.Exceptions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Jasily.Frameworks.Cli.Core
 {
@@ -19,6 +21,9 @@ namespace Jasily.Frameworks.Cli.Core
             this.ParameterName = this._parameterConfiguration.ParameterInfo.Name;
         }
 
+        /// <summary>
+        /// Parameter Declaring Name
+        /// </summary>
         public string ParameterName { get; }
 
         public IReadOnlyList<string> Values { get; }
@@ -45,18 +50,16 @@ namespace Jasily.Frameworks.Cli.Core
             return this._parameterConfiguration.IsArray || this._values.Count == 0;
         }
 
-        /// <summary>
-        /// verify whether is value is ok.
-        /// </summary>
-        internal void Verify()
+        internal object GetValue()
         {
+            // array
             if (this._parameterConfiguration.IsArray)
             {
                 if (this._parameterConfiguration.ArrayMinLength > 0)
                 {
                     if (this._parameterConfiguration.ArrayMinLength > this.Values.Count)
                     {
-                        throw InvalidArgumentException.Build(this, $"count >= {this.ParameterProperties.ArrayMinLength}");
+                        return this.InvalidArgument<object>($"count >= {this.ParameterProperties.ArrayMinLength}");
                     }
                 }
 
@@ -64,21 +67,29 @@ namespace Jasily.Frameworks.Cli.Core
                 {
                     if (this._parameterConfiguration.ArrayMaxLength < this.Values.Count)
                     {
-                        throw InvalidArgumentException.Build(this, $"count <= {this.ParameterProperties.ArrayMaxLength}");
+                        return this.InvalidArgument<object>($"count <= {this.ParameterProperties.ArrayMaxLength}");
                     }
                 }
-            }
-            else if (this.Values.Count > 1)
-            {
-                throw new ConvertException("too many arguments.");
-            }
-        }
 
-        internal object GetValue()
-        {
-            return this._parameterConfiguration.IsArray
-                ? this._parameterConfiguration.ValueConverter.Convert(this.Values)
-                : this._parameterConfiguration.ValueConverter.Convert(this.Values.Single());
+                return this._parameterConfiguration.ValueConverter.Convert(this.Values);
+            }
+
+            // single
+            switch (this.Values.Count)
+            {
+                case 0:
+                    if (this._parameterConfiguration.ParameterInfo.HasDefaultValue)
+                    {
+                        return this._parameterConfiguration.ParameterInfo.DefaultValue;
+                    }
+                    return this.UnResolveArgument<object>();
+
+                case 1:
+                    return this._parameterConfiguration.ValueConverter.Convert(this.Values[0]);
+
+                default:
+                    throw new ConvertException("too many arguments.");
+            }
         }
     }
 }

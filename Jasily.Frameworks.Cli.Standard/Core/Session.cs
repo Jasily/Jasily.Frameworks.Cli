@@ -14,14 +14,16 @@ namespace Jasily.Frameworks.Cli.Core
         private readonly IServiceProvider _serviceProvider;
         private readonly List<ResolvedNode> _nodes = new List<ResolvedNode>();
 
-        public Session(IServiceProvider serviceProvider)
+        public Session(IServiceProvider serviceProvider, IArgumentList argv, SessionConfigurator configurator)
         {
             this._serviceProvider = serviceProvider;
+            this.Argv = argv;
+            this.ExecuteMode = configurator.Mode;
         }
 
-        public IReadOnlyList<string> OriginalArgv { get; set; }
+        public ExecuteMode ExecuteMode { get; }
 
-        public IArgumentList Argv { get; set; }
+        public IArgumentList Argv { get; }
 
         public void DrawUsage()
         {

@@ -110,15 +110,14 @@ namespace Jasily.Frameworks.Cli.Commands
             var oa = new OverrideArguments();
             if (this.ParameterConfigurations.Count > 0)
             {
-                var avs = new ReadOnlyCollection<ArgumentValue>(
-                    this.ParameterConfigurations.Where(z => !z.IsResolveByEngine)
-                        .Select(z => new ArgumentValue(z)).ToArray()
-                );
-                var parser = serviceProvider.GetRequiredService<IArgumentParser>();
-                parser.Parse(args, avs);
-                foreach (var item in avs.Where(z => z.IsSetedValue()))
+                var avs = this.ParameterConfigurations
+                    .Where(z => !z.IsResolveByEngine)
+                    .Select(z => new ArgumentValue(z))
+                    .ToArray()
+                    .AsReadOnly();
+                serviceProvider.GetRequiredService<IArgumentParser>().Parse(args, avs);
+                foreach (var item in avs)
                 {
-                    item.Verify();
                     oa.AddArgument(item.ParameterName, item.GetValue());
                 }
             }

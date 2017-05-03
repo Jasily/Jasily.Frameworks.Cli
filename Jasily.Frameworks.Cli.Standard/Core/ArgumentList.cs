@@ -10,26 +10,16 @@ namespace Jasily.Frameworks.Cli.Core
 {
     internal class ArgumentList : IArgumentList
     {
-        private readonly StringComparer stringComparer;
-        private readonly List<ReadOnlyCollection<string>> groups;
+        private readonly List<ReadOnlyCollection<string>> _groups;
 
-        public ArgumentList([NotNull] StringComparer comparer)
+        public ArgumentList(SessionConfigurator configurator)
         {
-            this.stringComparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
-            this.groups = new List<ReadOnlyCollection<string>>();
-            this.Groups = new ReadOnlyCollection<ReadOnlyCollection<string>>(this.groups);
+            this.Argv = configurator.Argv.ToArray().AsReadOnly();
+            this._groups = new List<ReadOnlyCollection<string>>();
+            this.Groups = new ReadOnlyCollection<ReadOnlyCollection<string>>(this._groups);
         }
 
-        internal void SetArgv(string[] argv)
-        {
-            if (argv == null) throw new ArgumentNullException(nameof(argv));
-            if (argv.Any(z => z == null)) throw new ArgumentException(nameof(argv));
-            if (this.Argv != null) throw new InvalidOperationException();
-
-            this.Argv = new ReadOnlyCollection<string>(argv.ToArray());
-        }
-
-        public IReadOnlyList<string> Argv { get; private set; }
+        public IReadOnlyList<string> Argv { get; }
 
         public int UsedArgvCount { get; private set; }
 
@@ -43,8 +33,8 @@ namespace Jasily.Frameworks.Cli.Core
 
         public void Grouped()
         {
-            var count = this.groups.Sum(z => z.Count);
-            this.groups.Add(new ReadOnlyCollection<string>(this.Argv.Skip(count).Take(this.UsedArgvCount - count).ToArray()));
+            var count = this._groups.Sum(z => z.Count);
+            this._groups.Add(new ReadOnlyCollection<string>(this.Argv.Skip(count).Take(this.UsedArgvCount - count).ToArray()));
         }
     }
 }

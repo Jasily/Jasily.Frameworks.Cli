@@ -58,10 +58,10 @@ namespace Jasily.Frameworks.Cli.Commands
 
             if (args.TryGetNextArgument(out var name))
             {
-                if (this._commandsMap.TryGetValue(name, out var command))
+                if (this._commandsMap.TryGetValue(name, out var x))
                 {
                     args.UseOne();
-                    return command;
+                    return x;
                 }
 
                 if (args.Argv.Count - args.UsedArgvCount == 1 &&
