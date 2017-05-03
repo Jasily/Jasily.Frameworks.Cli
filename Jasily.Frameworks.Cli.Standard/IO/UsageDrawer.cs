@@ -8,17 +8,17 @@ namespace Jasily.Frameworks.Cli.IO
 {
     internal class UsageDrawer : IUsageDrawer
     {
-        private readonly IOutputer outputer;
+        private readonly IOutputer _outputer;
 
         public UsageDrawer(IOutputer outputer)
         {
-            this.outputer = outputer;
+            this._outputer = outputer;
         }
 
         public void DrawRouter(IReadOnlyCollection<ICommandProperties> commands)
         {
-            this.outputer.WriteLine(OutputLevel.Usage, "Usage:");
-            this.outputer.WriteLine(OutputLevel.Usage, "   CommandsProperties:");
+            this._outputer.WriteLine(OutputLevel.Usage, "Usage:");
+            this._outputer.WriteLine(OutputLevel.Usage, "   CommandsProperties:");
             var sb = new StringBuilder();
             foreach (var cmd in commands)
             {
@@ -31,14 +31,14 @@ namespace Jasily.Frameworks.Cli.IO
                     sb.Append("   ");
                     sb.Append($"(Alias: {string.Join(" / ", names)})");
                 }                
-                this.outputer.WriteLine(OutputLevel.Usage, sb.ToString());
+                this._outputer.WriteLine(OutputLevel.Usage, sb.ToString());
             }
         }
 
         public void DrawParameter(ICommandProperties command, IReadOnlyList<IParameterProperties> parameters)
         {
-            this.outputer.WriteLine(OutputLevel.Usage, "Usage:");
-            this.outputer.WriteLine(OutputLevel.Usage, $"   Parameters of CommandsProperties <{command.Names[0]}>:");
+            this._outputer.WriteLine(OutputLevel.Usage, "Usage:");
+            this._outputer.WriteLine(OutputLevel.Usage, $"   Parameters of CommandsProperties <{command.Names[0]}>:");
             var sb = new StringBuilder();
             foreach (var parameter in parameters)
             {
@@ -101,7 +101,7 @@ namespace Jasily.Frameworks.Cli.IO
                     sb.Append("   ");
                     sb.Append($"(Alias: {string.Join(" / ", parameter.Names.Skip(1))})");
                 }
-                this.outputer.WriteLine(OutputLevel.Usage, sb.ToString());
+                this._outputer.WriteLine(OutputLevel.Usage, sb.ToString());
             }
         }
     }
