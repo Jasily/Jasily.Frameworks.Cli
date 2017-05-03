@@ -6,20 +6,22 @@ using JetBrains.Annotations;
 
 namespace Jasily.Frameworks.Cli.Commands
 {
-    internal class InstancedCommand : ICommand
+    /// <summary>
+    /// provide binded instance command wrapper.
+    /// </summary>
+    internal class BindedCommand
     {
         private readonly object _instance;
         private readonly ICommand _innerCommand;
 
-        public InstancedCommand([NotNull] ICommand innerCommand, [NotNull] object instance)
+        public BindedCommand([NotNull] ICommand innerCommand, [NotNull] object instance)
         {
             this._innerCommand = innerCommand ?? throw new ArgumentNullException(nameof(innerCommand));
             this._instance = instance ?? throw new ArgumentNullException(nameof(instance));
         }
 
-        public object Invoke(IServiceProvider serviceProvider, object instance)
+        public object Invoke(IServiceProvider serviceProvider)
         {
-            if (instance != null) throw new ArgumentException("WTF");
             return this._innerCommand.Invoke(serviceProvider, this._instance);
         }
 
