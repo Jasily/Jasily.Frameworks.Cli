@@ -22,8 +22,8 @@ namespace Jasily.Frameworks.Cli.Tests.Olds
         {
             foreach (var item in this.Fire<TestClassParamsArray>())
             {
-                Assert.AreEqual(null, item.Execute(new[] { nameof(TestClassParamsArray.Func), "1" }));
-                Assert.AreEqual(null, item.Execute(new[] { nameof(TestClassParamsArray.Func)}));
+                Assert.AreEqual(null, item.Execute(new[] { nameof(TestClassParamsArray.Func), "1" }).Value);
+                Assert.AreEqual(null, item.Execute(new[] { nameof(TestClassParamsArray.Func)}).Value);
             }
         }
     }

@@ -78,11 +78,11 @@ namespace Jasily.Frameworks.Cli.Tests.Olds
                 Assert.AreEqual(1, item.Execute(new[] {
                     nameof(AsyncCommandClass1.GetCommandClass2),
                     nameof(CommandClass2.Number),
-                    "1" }));
+                    "1" }).Value);
                 Assert.AreEqual(455, item.Execute(new[] {
                     nameof(AsyncCommandClass1.GetCommandClass2),
                     nameof(CommandClass2.Select),
-                    "1", "2", "455" }));
+                    "1", "2", "455" }).Value);
             }
         }
     }

@@ -29,17 +29,17 @@ namespace Jasily.Frameworks.Cli.Tests.Olds
         {
             foreach (var item in this.Fire<Class1>())
             {
-                Assert.AreEqual(1, item.Execute(new[] { nameof(Class1.Value) }));
+                Assert.AreEqual(1, item.Execute(new[] { nameof(Class1.Value) }).Value);
             }
 
             foreach (var item in this.Fire<Class2>())
             {
-                Assert.AreEqual(null, item.Execute(new[] { nameof(Class2.Value) }));
+                Assert.AreEqual(null, item.Execute(new[] { nameof(Class2.Value) }).Value);
             }
 
             foreach (var item in this.Fire<Class3>())
             {
-                Assert.AreEqual(3, item.Execute(new[] { nameof(Class3.Value) }));
+                Assert.AreEqual(3, item.Execute(new[] { nameof(Class3.Value) }).Value);
             }
         }
 
@@ -61,12 +61,12 @@ namespace Jasily.Frameworks.Cli.Tests.Olds
         {
             foreach (var item in this.Fire<Class4>())
             {
-                Assert.AreEqual(1, item.Execute(new[] { nameof(Class4.Value) }));
+                Assert.AreEqual(1, item.Execute(new[] { nameof(Class4.Value) }).Value);
             }
 
             foreach (var item in this.Fire<Class5>())
             {
-                Assert.AreEqual(1, item.Execute(new[] { nameof(Class5.Value) }));
+                Assert.AreEqual(1, item.Execute(new[] { nameof(Class5.Value) }).Value);
             }
         }
     }
