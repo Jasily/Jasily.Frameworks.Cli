@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Jasily.Frameworks.Cli.Commands;
 using Jasily.Frameworks.Cli.Exceptions;
 using Jasily.Frameworks.Cli.IO;
@@ -11,7 +12,7 @@ namespace Jasily.Frameworks.Cli.Core
     internal class Session : ISession
     {
         private readonly IServiceProvider _serviceProvider;
-        private CommandRouter _router;
+        private readonly List<CommandRouter> _routers = new List<CommandRouter>();
         private BaseCommand _command;
 
         public Session(IServiceProvider serviceProvider)
@@ -25,23 +26,15 @@ namespace Jasily.Frameworks.Cli.Core
 
         public void DrawUsage()
         {
-            if (this._router == null && this._command == null)
-            {
-                throw new InvalidOperationException();
-            }
+            var drawer = this._serviceProvider.GetRequiredService<IUsageDrawer>();
+
             if (this._command != null)
             {
-                this._serviceProvider.GetRequiredService<IUsageDrawer>()
-                    .DrawParameter(this._command.Properties, this._command.ParameterConfigurations);
-            }
-            else if (this._router != null)
-            {
-                this._serviceProvider.GetRequiredService<IUsageDrawer>()
-                    .DrawRouter(this._router);
+                drawer.DrawParameter(this._command.Properties, this._command.ParameterConfigurations);
             }
             else
             {
-                throw new InvalidOperationException();
+                drawer.DrawRouter(this._routers.Last());
             }
         }
 
@@ -58,12 +51,11 @@ namespace Jasily.Frameworks.Cli.Core
         public void AddRouter(CommandRouter router)
         {
             this._command = null;
-            this._router = router;
+            this._routers.Add(router);
         }
 
         public void AddCommand(BaseCommand command)
         {
-            this._router = null;
             this._command = command;
         }
     }

@@ -76,7 +76,7 @@ namespace Jasily.Frameworks.Cli.Commands
             object ContinueExecute()
             {
                 session.Argv.Grouped();
-                var router = new CommandRouterBuilder(value).Build(serviceProvider);
+                var router = CommandRouter.Build(serviceProvider, value);
                 return router.Execute(serviceProvider);
             }
 

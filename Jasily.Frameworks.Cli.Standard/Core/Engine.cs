@@ -15,7 +15,7 @@ namespace Jasily.Frameworks.Cli.Core
 
         public Executor Fire(object instance)
         {
-            return new Executor(this, new CommandRouterBuilder(instance).Build(this.ServiceProvider));
+            return new Executor(this, CommandRouter.Build(this.ServiceProvider, instance));
         }
     }
 }

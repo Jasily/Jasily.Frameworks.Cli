@@ -87,6 +87,12 @@ namespace Jasily.Frameworks.Cli.Configurations
             throw new InvalidOperationException();
         }
 
+        public IMethodConfiguration GetConfigure(MethodInfo method)
+        {
+            if (this._methodsConfigurations.TryGetValue(method, out var v)) return v;
+            throw new InvalidOperationException();
+        }
+
         public IReadOnlyList<ICommand> AvailableCommands
         {
             get

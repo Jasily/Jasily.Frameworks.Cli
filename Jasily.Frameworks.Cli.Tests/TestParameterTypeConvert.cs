@@ -1,5 +1,6 @@
 ﻿using System;
 using Jasily.Frameworks.Cli.Attributes;
+using Jasily.Frameworks.Cli.Tests.Olds;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Jasily.Frameworks.Cli.Tests

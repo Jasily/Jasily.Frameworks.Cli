@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Reflection;
 using Jasily.Frameworks.Cli.Configurations;
 using Jasily.Frameworks.Cli.Core;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,18 +13,15 @@ namespace Jasily.Frameworks.Cli.Commands
 {
     internal class CommandRouter : ICommandRouter
     {
-        public IReadOnlyCollection<ICommand> Commands { get; }
-
-        public IReadOnlyDictionary<string, ICommand> CommandsMap { get; }
-
-        IReadOnlyCollection<ICommandProperties> ICommandRouter.Commands => this.Commands.Select(z => z.Properties).ToArray()
-            .AsReadOnly();
+        private readonly IReadOnlyCollection<ICommand> _commands;
+        private readonly IReadOnlyDictionary<string, ICommand> _commandsMap;
+        private readonly IReadOnlyCollection<ICommandProperties> _commandProperties;
 
         public CommandRouter(StringComparer comparer, IEnumerable<ICommand> commands)
         {
-            this.Commands = commands.ToArray().AsReadOnly();
+            this._commands = commands.ToArray().AsReadOnly();
             var map = new Dictionary<string, ICommand>(comparer);
-            foreach (var cmd in this.Commands)
+            foreach (var cmd in this._commands)
             {
                 foreach (var name in cmd.Properties.Names)
                 {
@@ -38,8 +36,11 @@ namespace Jasily.Frameworks.Cli.Commands
                     
                 }
             }
-            this.CommandsMap = map;
+            this._commandsMap = map;
+            this._commandProperties = this._commands.Select(z => z.Properties).ToArray().AsReadOnly();
         }
+
+        IReadOnlyCollection<ICommandProperties> ICommandRouter.Commands => this._commandProperties;
 
         public object Execute(IServiceProvider serviceProvider)
         {
@@ -52,11 +53,11 @@ namespace Jasily.Frameworks.Cli.Commands
         {
             var args = session.Argv;
 
-            if (this.Commands.Count == 0) return session.UnknownArguments<ICommand>();
+            if (this._commands.Count == 0) return session.UnknownArguments<ICommand>();
 
             if (args.TryGetNextArgument(out var name))
             {
-                if (this.CommandsMap.TryGetValue(name, out var command))
+                if (this._commandsMap.TryGetValue(name, out var command))
                 {
                     args.UseOne();
                     return command;
@@ -75,6 +76,21 @@ namespace Jasily.Frameworks.Cli.Commands
 
             session.DrawUsage();
             return null;
+        }
+
+        public static CommandRouter Build(IServiceProvider provider, object instance)
+        {
+            if (instance == null) throw new InvalidOperationException();
+            var comparer = provider.GetRequiredService<StringComparer>();
+            var commands = new List<ICommand>(FindCommand(provider, instance));
+            return new CommandRouter(comparer, commands);
+        }
+
+        private static IEnumerable<ICommand> FindCommand(IServiceProvider provider, object instance)
+        {
+            var type = typeof(TypeConfiguration<>).FastMakeGenericType(instance.GetType());
+            var configuration = (ITypeConfiguration)provider.GetRequiredService(type);
+            return configuration.AvailableCommands.Select(z => new InstancedCommand(z, instance));
         }
     }
 }

@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Jasily.Frameworks.Cli.Attributes;
-using System.Threading.Tasks;
 using System.Text;
-using Jasily.Frameworks.Cli.Core;
 using Jasily.Frameworks.Cli.IO;
 using JetBrains.Annotations;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Jasily.Frameworks.Cli.Tests
+namespace Jasily.Frameworks.Cli.Tests.Olds
 {
     public class BaseTest
     {

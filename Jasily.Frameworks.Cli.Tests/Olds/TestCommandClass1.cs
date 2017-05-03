@@ -2,7 +2,7 @@
 using Jasily.Frameworks.Cli.Attributes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Jasily.Frameworks.Cli.Tests
+namespace Jasily.Frameworks.Cli.Tests.Olds
 {
     [TestClass]
     public class TestCommandClass1 : BaseTest
