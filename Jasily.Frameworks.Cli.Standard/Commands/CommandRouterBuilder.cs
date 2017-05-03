@@ -21,11 +21,11 @@ namespace Jasily.Frameworks.Cli.Commands
         {
             if (this._instances == null) throw new InvalidOperationException();
             var comparer = provider.GetRequiredService<StringComparer>();
-            var commands = new List<ICommand>(this.FindCommand(provider, this._instances));
+            var commands = new List<ICommand>(FindCommand(provider, this._instances));
             return new CommandRouter(comparer, commands);
         }
 
-        private IEnumerable<ICommand> FindCommand(IServiceProvider provider, object instance)
+        private static IEnumerable<ICommand> FindCommand(IServiceProvider provider, object instance)
         {
             var type = typeof(TypeConfiguration<>).FastMakeGenericType(instance.GetType());
             var configuration = (ITypeConfiguration)provider.GetRequiredService(type);
