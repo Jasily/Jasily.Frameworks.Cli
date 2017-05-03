@@ -49,13 +49,23 @@ namespace Jasily.Frameworks.Cli.Commands
                     throw;
                 }
             }
-            var oa = GetArguments();
+
+            var overrideArguments = GetArguments();
+
+            // on interactive mode, arguments cannot 
+            if (session.ExecuteMode == ExecuteMode.Interactive)
+            {
+                if (!session.Argv.IsAllUsed())
+                {
+                    return session.UnknownArguments<object>();
+                }
+            }
 
             object InternalInvoke()
             {
                 try
                 {
-                    return this.Invoke(instance, serviceProvider, oa);
+                    return this.Invoke(instance, serviceProvider, overrideArguments);
                 }
                 catch (ParameterResolveException)
                 {

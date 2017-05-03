@@ -8,16 +8,24 @@ namespace Jasily.Frameworks.Cli.Exceptions
 {
     internal static class ExceptionThrower
     {
-        public static T UnknownArguments<T>(this ISession session)
+        /// <summary>
+        ///  
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="session"></param>
+        /// <returns></returns>
+        public static T UnknownArguments<T>([NotNull] this ISession session)
         {
+            if (session == null) throw new ArgumentNullException(nameof(session));
             var args = session.Argv.GetUnusedArguments();
-            throw new UnknownArgumentsException($"Unknown Arguments: ({string.Join(", ", args)})");
+            throw new ArgumentsException($"Unknown Arguments: ({string.Join(", ", args)})");
         }
 
-        public static T UnknownCommand<T>(this ISession session)
+        public static T UnknownCommand<T>([NotNull] this ISession session)
         {
+            if (session == null) throw new ArgumentNullException(nameof(session));
             var args = session.Argv.GetUnusedArguments();
-            throw new UnknownCommandException($"Unknown Command: <{args.First()}>");
+            throw new ArgumentsException($"Unknown Command: <{args.First()}>");
         }
 
         internal static T InvalidArgument<T>([NotNull] this ArgumentValue value, string requireDetail)

@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Jasily.Frameworks.Cli
 {
-    public static class Extensions
+    internal static class Extensions
     {
         public static bool TryGetNextArgument(this IArgumentList args, out string value)
         {
@@ -33,6 +33,11 @@ namespace Jasily.Frameworks.Cli
             args.Use(1);
         }
 
+        /// <summary>
+        /// Check if all argument are used.
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public static bool IsAllUsed(this IArgumentList args)
         {
             if (args == null) throw new ArgumentNullException(nameof(args));
