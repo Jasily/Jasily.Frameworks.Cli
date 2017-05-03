@@ -72,8 +72,8 @@ namespace Jasily.Frameworks.Cli.Commands
                     return session.UnknownCommand<ICommand>();
                 }
             }
+
             session.DrawUsage();
-            session.Termination();
             return null;
         }
     }
