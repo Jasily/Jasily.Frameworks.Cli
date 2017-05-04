@@ -10,6 +10,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Jasily.Frameworks.Cli
 {
+    /// <summary>
+    /// The engine executor.
+    /// </summary>
     public struct Executor
     {
         private readonly Engine _engine;
@@ -20,17 +23,23 @@ namespace Jasily.Frameworks.Cli
             this.Value = instance;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public object Value { get; }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="argv"></param>
+        /// <param name="isOutputValue"></param>
+        /// <param name="mode"></param>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="InvalidOperationException"></exception>
         /// <returns></returns>
-        public Executor Execute([NotNull, ItemNotNull] string[] argv, ExecuteMode mode = ExecuteMode.Default)
+        public Executor Execute([NotNull, ItemNotNull] string[] argv,
+            bool isOutputValue = true, ExecuteMode mode = ExecuteMode.Default)
         {
             if (argv == null) throw new ArgumentNullException(nameof(argv));
             if (argv.Any(string.IsNullOrEmpty))
@@ -59,7 +68,7 @@ namespace Jasily.Frameworks.Cli
                 try
                 {
                     var value = router.Execute(s.ServiceProvider);
-                    if (value != null)
+                    if (value != null && isOutputValue)
                     {
                         var formater = this._engine.ServiceProvider.GetRequiredService<IValueFormater>();
                         this._engine.ServiceProvider.GetRequiredService<IOutputer>()
