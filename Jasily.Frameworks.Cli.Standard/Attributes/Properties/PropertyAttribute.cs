@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace Jasily.Frameworks.Cli.Attributes.Properties
 {
-    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Parameter)]
     public class PropertyAttribute : Attribute, IConfigureableAttribute<IPropertiesConfigurator>
     {
         public PropertyAttribute(string name, string value)

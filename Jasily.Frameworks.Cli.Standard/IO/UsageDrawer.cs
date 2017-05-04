@@ -10,45 +10,60 @@ namespace Jasily.Frameworks.Cli.IO
     {
         private const int IndentCell = 3;
         private readonly IOutputer _outputer;
+        private readonly StringBuilder _sb = new StringBuilder();
 
         public UsageDrawer(IOutputer outputer)
         {
             this._outputer = outputer;
         }
 
+        private void AppendDescription(IBaseProperties properties)
+        {
+            var desc = properties[KnownPropertiesNames.Description];
+
+            if (desc.Length > 0)
+            {
+                this._sb.AppendLine().Append(' ', IndentCell * 10).Append(desc);
+            }
+        }
+
         public void DrawRouter(IReadOnlyCollection<ICommandProperties> commands)
         {
-            var sb = new StringBuilder();
-            sb.AppendLine("Usage:");
-            sb.Append(' ', IndentCell * 1).AppendLine("Commands:");
+            this._sb.AppendLine("Usage:");
+            this._sb.Append(' ', IndentCell * 1).AppendLine("Commands:");
 
             foreach (var cmd in commands)
             {
-                var ns = new List<string> { cmd[KnownPropertiesNames.DisplayName] };
-                ns.AddRange(cmd.Names);
-                var names = new Queue<string>(ns);               
-                sb.Append(' ', IndentCell * 2).Append(names.Dequeue());
+                Queue<string> GetName()
+                {
+                    var ns = new List<string> { cmd[KnownPropertiesNames.DisplayName] };
+                    ns.AddRange(cmd.Names);
+                    return new Queue<string>(ns);
+                }
+
+                var names = GetName();
+                var fn = names.Dequeue();
+                this._sb.Append(' ', IndentCell * 2).Append(fn);
                 if (names.Count > 0)
                 {
-                    sb.Append(' ', 3).Append($"(Alias: {string.Join(" / ", names)})");
-                }
+                    if (fn.Length < IndentCell * 6)
+                    {
+                        this._sb.Append(' ', IndentCell * 7 - fn.Length);
+                    }
 
-                var desc = cmd[KnownPropertiesNames.Description];
-                if (desc.Length > 0)
-                {
-                    sb.AppendLine().Append(' ', IndentCell * 3).Append(desc);
+                    this._sb.Append(' ', 3).Append($"(Alias: {string.Join(" / ", names)})");
                 }
-                sb.AppendLine();
+                this.AppendDescription(cmd);
+                this._sb.AppendLine();
             }
 
-            this._outputer.WriteLine(OutputLevel.Usage, sb.ToString());
+            this._outputer.WriteLine(OutputLevel.Usage, this._sb.ToString());
         }
 
         public void DrawParameter(ICommandProperties command, IReadOnlyList<IParameterProperties> parameters)
         {
-            var sb = new StringBuilder();
-            sb.AppendLine("Usage:");
-            sb.Append(' ', IndentCell * 1).AppendLine($"Parameters of Commands <{command[KnownPropertiesNames.DisplayName]}>:");
+            this._sb.AppendLine("Usage:");
+            this._sb.Append(' ', IndentCell * 1).AppendLine($"Parameters of Commands <{command[KnownPropertiesNames.DisplayName]}>:");
             
             foreach (var parameter in parameters)
             {
@@ -65,58 +80,56 @@ namespace Jasily.Frameworks.Cli.IO
                 }
                 
                 // content
-                sb.Append(' ', IndentCell * 2);
-                sb.Append(IsOptional() ? "(optional)" : "(required)");
+                this._sb.Append(' ', IndentCell * 2);
+                this._sb.Append(IsOptional() ? "(optional)" : "(required)");
 
-                sb.Append(' ', 3);
-                sb.Append(parameter[KnownPropertiesNames.DisplayName]);
-                sb.Append(" : ");
+                this._sb.Append(' ');
+                this._sb.Append(parameter[KnownPropertiesNames.DisplayName]);
+                this._sb.Append(" : ");
+
                 if (parameter.IsArray)
                 {
-                    sb.Append('[');
+                    this._sb.Append('[');
                     // ReSharper disable once PossibleNullReferenceException
-                    sb.Append(parameter.ArrayElementType.Name);
-                    sb.Append(", ...]");
+                    this._sb.Append(parameter.ArrayElementType.Name);
+                    this._sb.Append(", ...]");
 
                     void AppendIfRangeValid(string value)
                     {
-                        if (parameter.ArrayMinLength > 0 || parameter.ArrayMinLength > 0) sb.Append(value);
+                        if (parameter.ArrayMinLength > 0 || parameter.ArrayMinLength > 0) this._sb.Append(value);
                     }
 
                     AppendIfRangeValid(" require(");
                     if (parameter.ArrayMinLength > 0)
                     {
-                        sb.Append(parameter.ArrayMinLength.ToString()).Append("<");
+                        this._sb.Append(parameter.ArrayMinLength.ToString()).Append("<");
                     }
                     AppendIfRangeValid("COUNT");
                     if (parameter.ArrayMaxLength > 0)
                     {
-                        sb.Append("<").Append(parameter.ArrayMaxLength.ToString());
+                        this._sb.Append("<").Append(parameter.ArrayMaxLength.ToString());
                     }
                     AppendIfRangeValid(")");
                 }
                 else
                 {
-                    sb.Append(parameter.ParameterInfo.ParameterType.Name);
+                    this._sb.Append(parameter.ParameterInfo.ParameterType.Name);
                 }
+
                 if (parameter.Names.Count > 1)
                 {
-                    sb.Append("   ");
-                    sb.Append($"(Alias: {string.Join(" / ", parameter.Names.Skip(1))})");
+                    this._sb.Append("   ");
+                    this._sb.Append($"(Alias: {string.Join(" / ", parameter.Names.Skip(1))})");
                 }
 
                 // desc
-                var desc = parameter[KnownPropertiesNames.Description];
-                if (desc.Length > 0)
-                {
-                    sb.AppendLine().Append(' ', IndentCell * 3).Append(desc);
-                }
+                this.AppendDescription(parameter);
 
                 // end
-                sb.AppendLine();
+                this._sb.AppendLine();
             }
 
-            this._outputer.WriteLine(OutputLevel.Usage, sb.ToString());
+            this._outputer.WriteLine(OutputLevel.Usage, this._sb.ToString());
         }
     }
 }
