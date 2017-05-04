@@ -1,7 +1,7 @@
 ﻿using System;
 using Jasily.Frameworks.Cli.Configurations;
 
-namespace Jasily.Frameworks.Cli.Attributes
+namespace Jasily.Frameworks.Cli.Attributes.Parameters
 {
     /// <summary>
     /// this attribute only effect array typed parameter.

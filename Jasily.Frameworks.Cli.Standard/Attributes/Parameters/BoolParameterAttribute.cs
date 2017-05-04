@@ -2,7 +2,7 @@
 using Jasily.Frameworks.Cli.Configurations;
 using JetBrains.Annotations;
 
-namespace Jasily.Frameworks.Cli.Attributes
+namespace Jasily.Frameworks.Cli.Attributes.Parameters
 {
     /// <summary>
     /// this attribute only effect bool type parameter.

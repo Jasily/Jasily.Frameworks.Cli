@@ -36,13 +36,13 @@ namespace Jasily.Frameworks.Cli.Tests.TestInternal
             new EngineBuilder().Build(out var provider);
             Assert.AreEqual(false, provider.GetRequiredService<TypeConfiguration<Class001>>().IsDefinedCommand);
             Assert.AreEqual(true, provider.GetRequiredService<TypeConfiguration<Class002>>().IsDefinedCommand);
-            Assert.AreEqual(true, provider.GetRequiredService<TypeConfiguration<Class003>>().GetConfigure(
+            Assert.AreEqual(true, provider.GetRequiredService<TypeConfiguration<Class003>>().GetConfiguration(
                 typeof(Class003).GetProperty(nameof(Class003.Property1))).IsDefinedCommand);
-            Assert.AreEqual(false, provider.GetRequiredService<TypeConfiguration<Class003>>().GetConfigure(
+            Assert.AreEqual(false, provider.GetRequiredService<TypeConfiguration<Class003>>().GetConfiguration(
                 typeof(Class003).GetProperty(nameof(Class003.Property2))).IsDefinedCommand);
-            Assert.AreEqual(true, provider.GetRequiredService<TypeConfiguration<Class004>>().GetConfigure(
+            Assert.AreEqual(true, provider.GetRequiredService<TypeConfiguration<Class004>>().GetConfiguration(
                 typeof(Class004).GetMethod(nameof(Class004.Method1))).IsDefinedCommand);
-            Assert.AreEqual(false, provider.GetRequiredService<TypeConfiguration<Class004>>().GetConfigure(
+            Assert.AreEqual(false, provider.GetRequiredService<TypeConfiguration<Class004>>().GetConfiguration(
                 typeof(Class004).GetMethod(nameof(Class004.Method2))).IsDefinedCommand);
         }
     }
