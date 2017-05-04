@@ -1,9 +1,6 @@
-using System.Collections.Generic;
-
 namespace Jasily.Frameworks.Cli.Configurations
 {
-    public interface ICommandProperties
+    public interface ICommandProperties : IBaseProperties
     {
-        IReadOnlyList<string> Names { get; }
     }
 }

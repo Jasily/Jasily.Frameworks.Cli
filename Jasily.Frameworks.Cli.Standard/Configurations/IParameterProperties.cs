@@ -8,7 +8,7 @@ namespace Jasily.Frameworks.Cli.Configurations
     /// <summary>
     /// properties of method parameter.
     /// </summary>
-    public interface IParameterProperties
+    public interface IParameterProperties : IBaseProperties
     {
         /// <summary>
         /// 
@@ -24,12 +24,6 @@ namespace Jasily.Frameworks.Cli.Configurations
         /// is parameter has default value.
         /// </summary>
         bool IsOptional { get; }
-
-        /// <summary>
-        /// names of parameter.
-        /// </summary>
-        [NotNull]
-        IReadOnlyList<string> Names { get; }
 
         /// <summary>
         /// is parameter type is array (var length).
