@@ -28,7 +28,8 @@ namespace Jasily.Frameworks.Cli.Configurations
             this._names.AddRange(nc.CreateNameList(declaringName));
 
             var pc = ConfigureConfigurator<IPropertiesConfigurator>(attributes, new PropertiesConfigurator());
-            pc.AddIfNotExists(KnownPropertiesNames.DisplayName, this._names[0]);
+            pc.Properties[KnownPropertiesNames.DisplayName] = this._names[0];
+            this.Properties.AddRange(pc.Properties);
         }
 
         public Dictionary<string, string> Properties { get; } = new Dictionary<string, string>();

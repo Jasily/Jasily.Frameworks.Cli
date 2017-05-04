@@ -8,6 +8,7 @@ namespace Jasily.Frameworks.Cli.IO
 {
     internal class UsageDrawer : IUsageDrawer
     {
+        private const int IndentCell = 3;
         private readonly IOutputer _outputer;
 
         public UsageDrawer(IOutputer outputer)
@@ -17,30 +18,38 @@ namespace Jasily.Frameworks.Cli.IO
 
         public void DrawRouter(IReadOnlyCollection<ICommandProperties> commands)
         {
-            this._outputer.WriteLine(OutputLevel.Usage, "Usage:");
-            this._outputer.WriteLine(OutputLevel.Usage, "   CommandsProperties:");
             var sb = new StringBuilder();
+            sb.AppendLine("Usage:");
+            sb.Append(' ', IndentCell * 1).AppendLine("Commands:");
+
             foreach (var cmd in commands)
             {
-                sb.Clear();
                 var ns = new List<string> { cmd[KnownPropertiesNames.DisplayName] };
                 ns.AddRange(cmd.Names);
                 var names = new Queue<string>(ns);               
-                sb.Append("      ").Append(names.Dequeue());
+                sb.Append(' ', IndentCell * 2).Append(names.Dequeue());
                 if (names.Count > 0)
                 {
-                    sb.Append("   ");
-                    sb.Append($"(Alias: {string.Join(" / ", names)})");
-                }                
-                this._outputer.WriteLine(OutputLevel.Usage, sb.ToString());
+                    sb.Append(' ', 3).Append($"(Alias: {string.Join(" / ", names)})");
+                }
+
+                var desc = cmd[KnownPropertiesNames.Description];
+                if (desc.Length > 0)
+                {
+                    sb.AppendLine().Append(' ', IndentCell * 3).Append(desc);
+                }
+                sb.AppendLine();
             }
+
+            this._outputer.WriteLine(OutputLevel.Usage, sb.ToString());
         }
 
         public void DrawParameter(ICommandProperties command, IReadOnlyList<IParameterProperties> parameters)
         {
-            this._outputer.WriteLine(OutputLevel.Usage, "Usage:");
-            this._outputer.WriteLine(OutputLevel.Usage, $"   Parameters of CommandsProperties <{command.Names[0]}>:");
             var sb = new StringBuilder();
+            sb.AppendLine("Usage:");
+            sb.Append(' ', IndentCell * 1).AppendLine($"Parameters of Commands <{command[KnownPropertiesNames.DisplayName]}>:");
+            
             foreach (var parameter in parameters)
             {
                 if (parameter.IsResolveByEngine) continue;
@@ -54,19 +63,12 @@ namespace Jasily.Frameworks.Cli.IO
 
                     return parameter.IsOptional;
                 }
+                
+                // content
+                sb.Append(' ', IndentCell * 2);
+                sb.Append(IsOptional() ? "(optional)" : "(required)");
 
-                sb.Clear();
-                sb.Append("      ");
-                if (IsOptional())
-                {
-                    sb.Append("(optional)");
-                }
-                else
-                {
-                    sb.Append("(required)");
-                }
-
-                sb.Append("   ");
+                sb.Append(' ', 3);
                 sb.Append(parameter[KnownPropertiesNames.DisplayName]);
                 sb.Append(" : ");
                 if (parameter.IsArray)
@@ -102,8 +104,19 @@ namespace Jasily.Frameworks.Cli.IO
                     sb.Append("   ");
                     sb.Append($"(Alias: {string.Join(" / ", parameter.Names.Skip(1))})");
                 }
-                this._outputer.WriteLine(OutputLevel.Usage, sb.ToString());
+
+                // desc
+                var desc = parameter[KnownPropertiesNames.Description];
+                if (desc.Length > 0)
+                {
+                    sb.AppendLine().Append(' ', IndentCell * 3).Append(desc);
+                }
+
+                // end
+                sb.AppendLine();
             }
+
+            this._outputer.WriteLine(OutputLevel.Usage, sb.ToString());
         }
     }
 }
