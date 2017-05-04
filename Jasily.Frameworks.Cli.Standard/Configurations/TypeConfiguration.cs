@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using Jasily.Core;
 using Jasily.DependencyInjection.MethodInvoker;
 using Jasily.Frameworks.Cli.Attributes;
 using Jasily.Frameworks.Cli.Commands;
@@ -30,10 +31,8 @@ namespace Jasily.Frameworks.Cli.Configurations
             this._serviceProvider = serviceProvider;
 
             // load attributes
-            this.TypeInfo = this.Type.GetTypeInfo();
-
-            var attributes = this.TypeInfo.GetCustomAttributes().ToArray();
-            this.Names = CreateNameList(attributes, this.Type.Name);
+            var attributes = typeof(TClass).GetTypeInfo().GetCustomAttributes().ToArray();
+            this.Names = CreateNameList(attributes, typeof(TClass).Name);
             this.IsDefinedCommand = attributes.OfType<CommandClassAttribute>().FirstOrDefault() != null;
             this.Configure(attributes);
 
@@ -63,10 +62,6 @@ namespace Jasily.Frameworks.Cli.Configurations
             this.CanBeResult = !configurator.IsNotResult;
         }
 
-        public Type Type { get; } = typeof(TClass);
-
-        public TypeInfo TypeInfo { get; }
-
         public bool IsDefinedCommand { get; }
 
         public bool CanBeResult { get; private set; }
@@ -81,13 +76,13 @@ namespace Jasily.Frameworks.Cli.Configurations
             throw new InvalidOperationException();
         }
 
-        public IPropertyConfiguration GetConfigure(PropertyInfo property)
+        public IPropertyConfiguration GetConfiguration(PropertyInfo property)
         {
             if (this._propertiesConfigurations.TryGetValue(property, out var v)) return v;
             throw new InvalidOperationException();
         }
 
-        public IMethodConfiguration GetConfigure(MethodInfo method)
+        public IMethodConfiguration GetConfiguration(MethodInfo method)
         {
             if (this._methodsConfigurations.TryGetValue(method, out var v)) return v;
             throw new InvalidOperationException();
