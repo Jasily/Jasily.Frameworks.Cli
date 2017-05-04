@@ -10,5 +10,8 @@ namespace Jasily.Frameworks.Cli.Configurations
     {
         [NotNull]
         IReadOnlyList<string> Names { get; }
+
+        [NotNull]
+        string this[[NotNull] string propertyName] { get; }
     }
 }

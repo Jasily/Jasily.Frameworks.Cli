@@ -21,7 +21,7 @@ namespace Jasily.Frameworks.Cli.Tests.Olds
         {
             public new int Value() => 3;
 
-            public void _() { }
+            public void _2() { }
         }
 
         [TestMethod]

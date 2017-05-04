@@ -23,8 +23,9 @@ namespace Jasily.Frameworks.Cli.IO
             foreach (var cmd in commands)
             {
                 sb.Clear();
-                var names = new Queue<string>();
-                foreach (var n in cmd.Names) names.Enqueue(n);                
+                var ns = new List<string> { cmd[KnownPropertiesNames.DisplayName] };
+                ns.AddRange(cmd.Names);
+                var names = new Queue<string>(ns);               
                 sb.Append("      ").Append(names.Dequeue());
                 if (names.Count > 0)
                 {
@@ -66,7 +67,7 @@ namespace Jasily.Frameworks.Cli.IO
                 }
 
                 sb.Append("   ");
-                sb.Append(parameter.Names[0]);
+                sb.Append(parameter[KnownPropertiesNames.DisplayName]);
                 sb.Append(" : ");
                 if (parameter.IsArray)
                 {

@@ -28,8 +28,6 @@ namespace Jasily.Frameworks.Cli.Core
 
         private void HandleNameValuePair(string name)
         {
-            throw new NotImplementedException();
-
             (string n, string v) TrySplitName()
             {
                 if (name.Contains('='))
@@ -50,7 +48,7 @@ namespace Jasily.Frameworks.Cli.Core
 
             var (n, v) = TrySplitName();
 
-            if (TryGetByName(n) is ArgumentValue slot)
+            if (this.TryGetByName(n) is ArgumentValue slot)
             {
                 this.arguments.UseOne();
 
@@ -71,7 +69,7 @@ namespace Jasily.Frameworks.Cli.Core
             var avs = new List<ArgumentValue>();
             foreach (var ch in flags)
             {
-                if (TryGetByName(ch.ToString()) is ArgumentValue av)
+                if (this.TryGetByName(ch.ToString()) is ArgumentValue av)
                 {
                     avs.Add(av);
                 }

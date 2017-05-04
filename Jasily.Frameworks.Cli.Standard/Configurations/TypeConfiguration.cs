@@ -17,7 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Jasily.Frameworks.Cli.Configurations
 {
-    internal class TypeConfiguration<TClass> : BaseConfiguration, ITypeConfiguration
+    internal sealed class TypeConfiguration<TClass> : BaseConfiguration, ITypeConfiguration
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly Dictionary<Type, ITypeConfiguration> _inheritedsConfigures = new Dictionary<Type, ITypeConfiguration>();
@@ -32,9 +32,8 @@ namespace Jasily.Frameworks.Cli.Configurations
 
             // load attributes
             var attributes = typeof(TClass).GetTypeInfo().GetCustomAttributes().ToArray();
-            this.Names = CreateNameList(attributes, typeof(TClass).Name);
+            this.Configure(attributes, typeof(TClass).Name);
             this.IsDefinedCommand = attributes.OfType<CommandClassAttribute>().FirstOrDefault() != null;
-            this.Configure(attributes);
 
             // load inherited class
             var t = typeof(TClass);
@@ -54,19 +53,17 @@ namespace Jasily.Frameworks.Cli.Configurations
                 .ToDictionary(z => z.Method);
         }
 
-        private void Configure(IEnumerable<Attribute> attributes)
+        protected override void Configure(Attribute[] attributes, string declaringName)
         {
-            var configurator = new CommandClassConfigurator();
-            attributes.OfType<IConfigureableAttribute<ICommandClassConfigurator>>()
-                .ForEach(z => z.Apply(configurator));
-            this.CanBeResult = !configurator.IsNotResult;
+            base.Configure(attributes, declaringName);
+
+            var cc = ConfigureConfigurator(attributes, new CommandClassConfigurator());
+            this.CanBeResult = !cc.IsNotResult;
         }
 
         public bool IsDefinedCommand { get; }
 
         public bool CanBeResult { get; private set; }
-
-        public IReadOnlyList<string> Names { get; }
 
         #region ITypeConfiguration
 
@@ -119,7 +116,7 @@ namespace Jasily.Frameworks.Cli.Configurations
             return new MethodConfiguration(this, method);
         }
 
-        internal class PropertyConfiguration : BaseConfiguration, IPropertyConfiguration
+        internal sealed class PropertyConfiguration : BaseConfiguration, IPropertyConfiguration
         {
             public PropertyConfiguration(TypeConfiguration<TClass> typeConfiguration, PropertyInfo property)
             {
@@ -127,13 +124,11 @@ namespace Jasily.Frameworks.Cli.Configurations
                 this.Property = property ?? throw new ArgumentNullException(nameof(property));
 
                 var attributes = property.GetCustomAttributes().ToArray();
-                this.Names = CreateNameList(attributes, property.Name);
+                this.Configure(attributes, property.Name);
                 this.IsDefinedCommand = attributes.OfType<CommandPropertyAttribute>().FirstOrDefault() != null;
             }
 
             public IServiceProvider ServiceProvider { get; }
-
-            public IReadOnlyList<string> Names { get; }
 
             public PropertyInfo Property { get; }
 
@@ -157,7 +152,7 @@ namespace Jasily.Frameworks.Cli.Configurations
             }
         }
 
-        internal class MethodConfiguration : BaseConfiguration, IMethodConfiguration
+        internal sealed class MethodConfiguration : BaseConfiguration, IMethodConfiguration
         {
             private IReadOnlyList<ParameterConfiguration> _parameterConfigurations;
 
@@ -165,15 +160,13 @@ namespace Jasily.Frameworks.Cli.Configurations
             {
                 this.ServiceProvider = typeConfiguration._serviceProvider;
                 this.Method = method ?? throw new ArgumentNullException(nameof(method));
-
+                
                 var attributes = method.GetCustomAttributes().ToArray();
-                this.Names = CreateNameList(attributes, method.Name);
+                this.Configure(attributes, method.Name);
                 this.IsDefinedCommand = attributes.OfType<CommandMethodAttribute>().FirstOrDefault() != null;
             }
 
             public IServiceProvider ServiceProvider { get; }
-
-            public IReadOnlyList<string> Names { get; }
 
             public MethodInfo Method { get; }
 
@@ -215,7 +208,7 @@ namespace Jasily.Frameworks.Cli.Configurations
             }
         }
 
-        internal class ParameterConfiguration : BaseConfiguration, IParameterConfiguration
+        internal sealed class ParameterConfiguration : BaseConfiguration, IParameterConfiguration
         {
             private readonly HashSet<string> _nameSet;
 
@@ -228,7 +221,7 @@ namespace Jasily.Frameworks.Cli.Configurations
                     .Contains(parameter.ParameterType);
 
                 var attributes = parameter.GetCustomAttributes().ToArray();
-                this.Names = CreateNameList(attributes, parameter.Name);
+                this.Configure(attributes, parameter.Name);
                 this._nameSet = new HashSet<string>(this.Names);
                 foreach (var name in this._nameSet)
                 {
@@ -291,8 +284,6 @@ namespace Jasily.Frameworks.Cli.Configurations
             public ParameterInfo ParameterInfo { get; }
 
             public IValueConverter ValueConverter { get; }
-
-            public IReadOnlyList<string> Names { get; }
 
             public bool IsResolveByEngine { get; }
 
