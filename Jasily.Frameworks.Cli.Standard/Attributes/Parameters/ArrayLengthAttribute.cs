@@ -20,12 +20,12 @@ namespace Jasily.Frameworks.Cli.Attributes.Parameters
             {
                 if (this.MinLength > 0 && array.Length < this.MinLength)
                 {
-                    this.InvalidArgument($"count >= {this.MinLength}");
+                    this.InvalidArgument($"arguments count must >= {this.MinLength}");
                 }
 
                 if (this.MaxLength > 0 && array.Length > this.MaxLength)
                 {
-                    this.InvalidArgument($"count <= {this.MaxLength}");
+                    this.InvalidArgument($"arguments count must <= {this.MaxLength}");
                 }
             }
         }
