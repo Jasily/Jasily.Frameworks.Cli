@@ -68,20 +68,10 @@ namespace Jasily.Frameworks.Cli.IO
             foreach (var parameter in parameters)
             {
                 if (parameter.IsResolveByEngine) continue;
-
-                bool IsOptional()
-                {
-                    if (parameter.IsArray && parameter.ArrayMinLength > 0)
-                    {
-                        return false;
-                    }
-
-                    return parameter.IsOptional;
-                }
                 
                 // content
                 this._sb.Append(' ', IndentCell * 2);
-                this._sb.Append(IsOptional() ? "(optional)" : "(required)");
+                this._sb.Append(parameter.IsOptional ? "(optional)" : "(required)");
 
                 this._sb.Append(' ');
                 this._sb.Append(parameter[KnownPropertiesNames.DisplayName]);
@@ -93,23 +83,6 @@ namespace Jasily.Frameworks.Cli.IO
                     // ReSharper disable once PossibleNullReferenceException
                     this._sb.Append(parameter.ArrayElementType.Name);
                     this._sb.Append(", ...]");
-
-                    void AppendIfRangeValid(string value)
-                    {
-                        if (parameter.ArrayMinLength > 0 || parameter.ArrayMinLength > 0) this._sb.Append(value);
-                    }
-
-                    AppendIfRangeValid(" require(");
-                    if (parameter.ArrayMinLength > 0)
-                    {
-                        this._sb.Append(parameter.ArrayMinLength.ToString()).Append("<");
-                    }
-                    AppendIfRangeValid("COUNT");
-                    if (parameter.ArrayMaxLength > 0)
-                    {
-                        this._sb.Append("<").Append(parameter.ArrayMaxLength.ToString());
-                    }
-                    AppendIfRangeValid(")");
                 }
                 else
                 {
@@ -120,6 +93,13 @@ namespace Jasily.Frameworks.Cli.IO
                 {
                     this._sb.Append("   ");
                     this._sb.Append($"(Alias: {string.Join(" / ", parameter.Names.Skip(1))})");
+                }
+
+                var cond = parameter.Conditions;
+                if (cond.Count > 0)
+                {
+                    this._sb.AppendLine().Append(' ', IndentCell * 3);
+                    this._sb.Append($" require( {string.Join(" , ", cond)} )");
                 }
 
                 // desc

@@ -211,6 +211,7 @@ namespace Jasily.Frameworks.Cli.Configurations
         internal sealed class ParameterConfiguration : BaseConfiguration, IParameterConfiguration
         {
             private readonly HashSet<string> _nameSet;
+            private readonly List<ICondition> _conditions= new List<ICondition>();
 
             internal ParameterConfiguration(MethodConfiguration method, ParameterInfo parameter,
                 Dictionary<string, ParameterInfo> conflictNameMap, StringComparer comaprer)
@@ -250,13 +251,6 @@ namespace Jasily.Frameworks.Cli.Configurations
                 {
                     this.IsArray = true;
                     this.ArrayElementType = this.ParameterInfo.ParameterType.GetElementType();
-
-                    var configurator = new ArrayParameterConfigurator();
-                    attributes.OfType<IConfigureableAttribute<IArrayParameterConfigurator>>()
-                        .ForEach(z => z.Apply(configurator));
-                    this.ArrayMinLength = configurator.MinLength;
-                    this.ArrayMaxLength = configurator.MaxLength;
-
                     this.ValueConverter = GetValueConverter(this.ArrayElementType);
                 }
                 else
@@ -281,6 +275,14 @@ namespace Jasily.Frameworks.Cli.Configurations
                 }
             }
 
+            protected override void Configure(Attribute[] attributes, string declaringName)
+            {
+                base.Configure(attributes, declaringName);
+
+                var pc = ConfigureConfigurator(attributes, new ParameterConfigurator());
+                this._conditions.AddRange(pc.Conditions.ToArray());
+            }
+
             public ParameterInfo ParameterInfo { get; }
 
             public IValueConverter ValueConverter { get; }
@@ -292,6 +294,8 @@ namespace Jasily.Frameworks.Cli.Configurations
                 return this._nameSet.Contains(name);
             }
 
+            public void Check(object value) => this._conditions.ForEach(z => z.Check(value));
+
             #region array typed parameter
 
             /// <summary>
@@ -299,17 +303,11 @@ namespace Jasily.Frameworks.Cli.Configurations
             /// </summary>
             public bool IsArray { get; }
 
-            /// <summary>
-            /// array constraints: min length
-            /// </summary>
-            public int ArrayMinLength { get; }
-
-            /// <summary>
-            /// arrat constraints: max length
-            /// </summary>
-            public int ArrayMaxLength { get; }
-
             public Type ArrayElementType { get; }
+
+            public IReadOnlyList<string> Conditions => 
+                this._conditions.Select(z => z.ToString()).Where(z => !string.IsNullOrWhiteSpace(z))
+                .ToArray();
 
             #endregion
 

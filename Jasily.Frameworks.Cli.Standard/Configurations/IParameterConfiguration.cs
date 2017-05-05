@@ -1,4 +1,5 @@
 using Jasily.Frameworks.Cli.Converters;
+using Jasily.Frameworks.Cli.Exceptions;
 
 namespace Jasily.Frameworks.Cli.Configurations
 {
@@ -7,5 +8,11 @@ namespace Jasily.Frameworks.Cli.Configurations
         IValueConverter ValueConverter { get; }
 
         bool IsMatchName(string name);
+
+        /// <summary>
+        /// <exception cref="InvalidArgumentException"></exception>
+        /// </summary>
+        /// <param name="value"></param>
+        void Check(object value);
     }
 }

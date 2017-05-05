@@ -165,7 +165,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Olds\BaseTest.cs" />
-    <Compile Include="Olds\TestArray.cs" />
+    <Compile Include="TestAttributes\TestArrayLengthAttribute.cs" />
     <Compile Include="Olds\TestAsyncCommandClass1.cs" />
     <Compile Include="Olds\TestCommandClass1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

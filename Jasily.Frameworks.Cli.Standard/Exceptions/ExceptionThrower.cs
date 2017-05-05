@@ -32,7 +32,7 @@ namespace Jasily.Frameworks.Cli.Exceptions
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
             var sb = new StringBuilder();
-            sb.Append($"Parameter <{value.ParameterProperties.Names[0]}> Value Invalid Error: require ");
+            sb.Append($"Parameter <{value.ParameterProperties.Names[0]}> Value Invalid Error: ");
             sb.Append(requireDetail);
             throw new ArgumentsException(sb.ToString());
         }

@@ -44,11 +44,6 @@ namespace Jasily.Frameworks.Cli.Tests.Olds
                 .InstallConsoleOutput()
                 .Build()
                 .Fire(new T());
-            yield return new EngineBuilder()
-                .InstallNetFramework()
-                .InstallConsoleOutput()
-                .Build()
-                .Fire(new T());
         }
     }
 }

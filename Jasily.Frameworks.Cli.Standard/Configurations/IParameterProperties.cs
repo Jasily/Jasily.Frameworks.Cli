@@ -31,19 +31,11 @@ namespace Jasily.Frameworks.Cli.Configurations
         bool IsArray { get; }
 
         /// <summary>
-        /// min length of array.
-        /// </summary>
-        int ArrayMinLength { get; }
-
-        /// <summary>
-        /// max length of array.
-        /// </summary>
-        int ArrayMaxLength { get; }
-
-        /// <summary>
         /// element type of array.
         /// </summary>
         [CanBeNull]
         Type ArrayElementType { get; }
+
+        IReadOnlyList<string> Conditions { get; }
     }
 }

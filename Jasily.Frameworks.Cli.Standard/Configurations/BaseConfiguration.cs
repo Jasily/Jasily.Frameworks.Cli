@@ -24,10 +24,10 @@ namespace Jasily.Frameworks.Cli.Configurations
 
         protected virtual void Configure(Attribute[] attributes, string declaringName)
         {
-            var nc = (NameConfigurator)ConfigureConfigurator<INameConfigurator>(attributes, new NameConfigurator());
+            var nc = ConfigureConfigurator(attributes, new NameConfigurator());
             this._names.AddRange(nc.CreateNameList(declaringName));
 
-            var pc = ConfigureConfigurator<IPropertiesConfigurator>(attributes, new PropertiesConfigurator());
+            var pc = ConfigureConfigurator(attributes, new PropertiesConfigurator());
             pc.Properties[KnownPropertiesNames.DisplayName] = this._names[0];
             this.Properties.AddRange(pc.Properties);
         }

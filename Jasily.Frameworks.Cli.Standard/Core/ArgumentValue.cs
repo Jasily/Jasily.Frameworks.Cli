@@ -52,25 +52,23 @@ namespace Jasily.Frameworks.Cli.Core
 
         internal object GetValue()
         {
+            var value = this.ConvertValue();
+            try
+            {
+                this._parameterConfiguration.Check(value);
+            }
+            catch (InvalidArgumentException e)
+            {
+                return this.InvalidArgument<object>(e.Message);
+            }
+            return value;
+        }
+
+        private object ConvertValue()
+        {
             // array
             if (this._parameterConfiguration.IsArray)
             {
-                if (this._parameterConfiguration.ArrayMinLength > 0)
-                {
-                    if (this._parameterConfiguration.ArrayMinLength > this.Values.Count)
-                    {
-                        return this.InvalidArgument<object>($"count >= {this.ParameterProperties.ArrayMinLength}");
-                    }
-                }
-
-                if (this._parameterConfiguration.ArrayMaxLength > 0)
-                {
-                    if (this._parameterConfiguration.ArrayMaxLength < this.Values.Count)
-                    {
-                        return this.InvalidArgument<object>($"count <= {this.ParameterProperties.ArrayMaxLength}");
-                    }
-                }
-
                 return this._parameterConfiguration.ValueConverter.Convert(this.Values);
             }
 
