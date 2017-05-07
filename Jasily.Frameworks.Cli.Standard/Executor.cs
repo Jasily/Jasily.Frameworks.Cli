@@ -46,60 +46,63 @@ namespace Jasily.Frameworks.Cli
             {
                 throw new ArgumentException($"Elements in <{nameof(argv)}> Cannot be Null Or Empty.", nameof(argv));
             }
-            if (this._engine == null || this.Value == null)
+            if (this._engine == null)
             {
                 throw new InvalidOperationException($"{nameof(Executor)} should Create by {nameof(Engine)}.");
             }
-            if (this.Value == null)
+
+            if (this.Value != null)
             {
-                throw new InvalidOperationException($"");
-            }
+                var router = CommandRouter.Build(this._engine.ServiceProvider, this.Value);
 
-            var router = CommandRouter.Build(this._engine.ServiceProvider, this.Value);
-
-            using (var s = this._engine.ServiceProvider.CreateScope())
-            {
-                var configurator = s.ServiceProvider.GetRequiredService<SessionConfigurator>();
-                configurator.Argv = argv;
-                configurator.Mode = mode;
-
-                var session = (Session)s.ServiceProvider.GetRequiredService<ISession>(); // init session.
-
-                try
+                using (var s = this._engine.ServiceProvider.CreateScope())
                 {
-                    var value = router.Execute(s.ServiceProvider);
-                    if (value != null && isOutputValue)
+                    var configurator = s.ServiceProvider.GetRequiredService<SessionConfigurator>();
+                    configurator.Argv = argv;
+                    configurator.Mode = mode;
+
+                    var session = (Session)s.ServiceProvider.GetRequiredService<ISession>(); // init session.
+
+                    try
                     {
-                        var formater = this._engine.ServiceProvider.GetRequiredService<IValueFormater>();
-                        this._engine.ServiceProvider.GetRequiredService<IOutputer>()
-                            .WriteLine(OutputLevel.Normal, formater.Format(value));
+                        var value = router.Execute(s.ServiceProvider);
+                        if (value != null && isOutputValue)
+                        {
+                            var formater = this._engine.ServiceProvider.GetRequiredService<IValueFormater>();
+                            var ft = formater.Format(value);
+                            if (ft != null)
+                            {
+                                this._engine.ServiceProvider.GetRequiredService<IOutputer>()
+                                    .WriteLine(OutputLevel.Normal, formater.Format(value));
+                            }
+                        }
+                        return new Executor(this._engine, value);
                     }
-                    return new Executor(this._engine, value);
-                }
-                catch (TerminationException) { /* ignore. */ }
-                catch (CliException e)
-                {
-                    if (e.Message.Length > 0)
+                    catch (TerminationException) { /* ignore. */ }
+                    catch (CliException e)
+                    {
+                        if (e.Message.Length > 0)
+                        {
+                            this._engine.ServiceProvider.GetRequiredService<IOutputer>()
+                                .WriteLine(OutputLevel.Error, e.Message);
+                        }
+                        session.DrawUsage();
+                    }
+                    catch (NotImplementedException e)
+                    {
+                        this._engine.ServiceProvider.GetRequiredService<IOutputer>()
+                            .WriteLine(OutputLevel.Error, e.ToString());
+                    }
+                    catch (InvalidOperationException e)
                     {
                         this._engine.ServiceProvider.GetRequiredService<IOutputer>()
                             .WriteLine(OutputLevel.Error, e.Message);
                     }
-                    session.DrawUsage();
-                }
-                catch (NotImplementedException e)
-                {
-                    this._engine.ServiceProvider.GetRequiredService<IOutputer>()
-                        .WriteLine(OutputLevel.Error, e.ToString());
-                }
-                catch (InvalidOperationException e)
-                {
-                    this._engine.ServiceProvider.GetRequiredService<IOutputer>()
-                        .WriteLine(OutputLevel.Error, e.Message);
-                }
-                catch (Exception e)
-                {
-                    this._engine.ServiceProvider.GetRequiredService<IOutputer>()
-                        .WriteLine(OutputLevel.Error, e.ToString());
+                    catch (Exception e)
+                    {
+                        this._engine.ServiceProvider.GetRequiredService<IOutputer>()
+                            .WriteLine(OutputLevel.Error, e.ToString());
+                    }
                 }
             }
 
