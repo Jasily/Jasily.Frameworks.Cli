@@ -34,14 +34,7 @@ namespace Jasily.Frameworks.Cli.IO
 
             foreach (var cmd in commands)
             {
-                Queue<string> GetName()
-                {
-                    var ns = new List<string> { cmd[KnownPropertiesNames.DisplayName] };
-                    ns.AddRange(cmd.Names);
-                    return new Queue<string>(ns);
-                }
-
-                var names = GetName();
+                var names = new Queue<string>(cmd.Names);
                 var fn = names.Dequeue();
                 this._sb.Append(' ', IndentCell * 2).Append(fn);
                 if (names.Count > 0)
@@ -63,7 +56,7 @@ namespace Jasily.Frameworks.Cli.IO
         public void DrawParameter(ICommandProperties command, IReadOnlyList<IParameterProperties> parameters)
         {
             this._sb.AppendLine("Usage:");
-            this._sb.Append(' ', IndentCell * 1).AppendLine($"Parameters of Commands <{command[KnownPropertiesNames.DisplayName]}>:");
+            this._sb.Append(' ', IndentCell * 1).AppendLine($"Parameters of Commands <{command.Names[0]}>:");
             
             foreach (var parameter in parameters)
             {
@@ -74,7 +67,7 @@ namespace Jasily.Frameworks.Cli.IO
                 this._sb.Append(parameter.IsOptional ? "(optional)" : "(required)");
 
                 this._sb.Append(' ');
-                this._sb.Append(parameter[KnownPropertiesNames.DisplayName]);
+                this._sb.Append(parameter.Names[0]);
                 this._sb.Append(" : ");
 
                 if (parameter.IsArray)
