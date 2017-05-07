@@ -28,7 +28,7 @@ namespace Jasily.Frameworks.Cli.Commands
                     {
                         if (!x.Equals(cmd))
                         {
-                            throw new InvalidOperationException($"Two command map to same name <{name}>");
+                            throw new InvalidOperationException($"Two commands map to same name <{name}>");
                         }
                     }
                     else

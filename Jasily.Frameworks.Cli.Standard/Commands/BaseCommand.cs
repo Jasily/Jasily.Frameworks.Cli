@@ -25,7 +25,7 @@ namespace Jasily.Frameworks.Cli.Commands
             this.Properties = properties;
         }
 
-        public MethodBase Method { get; }
+        protected MethodBase Method { get; }
 
         public abstract IReadOnlyList<IParameterConfiguration> ParameterConfigurations { get; }
 
@@ -39,7 +39,21 @@ namespace Jasily.Frameworks.Cli.Commands
             {
                 try
                 {
-                    return this.ResolveArguments(serviceProvider, session.Argv);
+                    var oa = new OverrideArguments();
+                    if (this.ParameterConfigurations.Count > 0)
+                    {
+                        var avs = this.ParameterConfigurations
+                            .Where(z => !z.IsResolveByEngine)
+                            .Select(z => new ArgumentValue(z))
+                            .ToArray()
+                            .AsReadOnly();
+                        serviceProvider.GetRequiredService<IArgumentParser>().Parse(session.Argv, avs);
+                        foreach (var item in avs)
+                        {
+                            oa.AddArgument(item.ParameterName, item.GetValue());
+                        }
+                    }
+                    return oa;
                 }
                 catch (ArgumentsException e)
                 {
@@ -114,25 +128,6 @@ namespace Jasily.Frameworks.Cli.Commands
         }
 
         public ICommandProperties Properties { get; }
-
-        public OverrideArguments ResolveArguments(IServiceProvider serviceProvider, IArgumentList args)
-        {
-            var oa = new OverrideArguments();
-            if (this.ParameterConfigurations.Count > 0)
-            {
-                var avs = this.ParameterConfigurations
-                    .Where(z => !z.IsResolveByEngine)
-                    .Select(z => new ArgumentValue(z))
-                    .ToArray()
-                    .AsReadOnly();
-                serviceProvider.GetRequiredService<IArgumentParser>().Parse(args, avs);
-                foreach (var item in avs)
-                {
-                    oa.AddArgument(item.ParameterName, item.GetValue());
-                }
-            }
-            return oa;
-        }
 
         public abstract object Invoke(object instance, IServiceProvider serviceProvider, OverrideArguments args);
     }

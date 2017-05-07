@@ -14,14 +14,14 @@ namespace Jasily.Frameworks.Cli.Commands
         public BindedCommand([NotNull] ICommand innerCommand, [NotNull] object instance)
         {
             this.InnerCommand = innerCommand ?? throw new ArgumentNullException(nameof(innerCommand));
-            this.Instance = instance ?? throw new ArgumentNullException(nameof(instance));
+            this._instance = instance ?? throw new ArgumentNullException(nameof(instance));
         }
 
-        public object Instance { get; }
+        private readonly object _instance;
 
         public object Invoke(IServiceProvider serviceProvider)
         {
-            return this.InnerCommand.Invoke(serviceProvider, this.Instance);
+            return this.InnerCommand.Invoke(serviceProvider, this._instance);
         }
 
         public bool Equals(BindedCommand other) => this.InnerCommand == other.InnerCommand;
