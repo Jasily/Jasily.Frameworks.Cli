@@ -6,22 +6,29 @@ using JetBrains.Annotations;
 
 namespace Jasily.Frameworks.Cli.Exceptions
 {
-    internal static class ExceptionThrower
+    public static class ExceptionThrower
     {
+        public static T UnknownArguments<T>([NotNull] this IArgumentList argv)
+        {
+            if (argv == null) throw new ArgumentNullException(nameof(argv));
+            var args = argv.GetUnusedArguments();
+            throw new ArgumentsException($"Unknown Arguments: ({string.Join(", ", args)})");
+        }
+
         /// <summary>
         ///  
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="session"></param>
         /// <returns></returns>
-        public static T UnknownArguments<T>([NotNull] this ISession session)
+        internal static T UnknownArguments<T>([NotNull] this ISession session)
         {
             if (session == null) throw new ArgumentNullException(nameof(session));
             var args = session.Argv.GetUnusedArguments();
             throw new ArgumentsException($"Unknown Arguments: ({string.Join(", ", args)})");
         }
 
-        public static T UnknownCommand<T>([NotNull] this ISession session)
+        internal static T UnknownCommand<T>([NotNull] this ISession session)
         {
             if (session == null) throw new ArgumentNullException(nameof(session));
             var args = session.Argv.GetUnusedArguments();
@@ -37,7 +44,7 @@ namespace Jasily.Frameworks.Cli.Exceptions
             throw new ArgumentsException(sb.ToString());
         }
 
-        public static T UnResolveArgument<T>([NotNull] this ArgumentValue value)
+        internal static T UnResolveArgument<T>([NotNull] this ArgumentValue value)
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
 

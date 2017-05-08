@@ -1,137 +1,138 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
 using Jasily.Frameworks.Cli.Core;
+using Jasily.Frameworks.Cli.Exceptions;
+using JetBrains.Annotations;
 
 namespace Jasily.Frameworks.Cli.Core
 {
     public class ArgumentParser : IArgumentParser
     {
-        private Queue<ArgumentValue> requires;
-        private IArgumentList arguments;
-        private IReadOnlyList<ArgumentValue> valueList;
-
-        private ArgumentValue TryGetByName(string name)
+        public void Parse(IArgumentList arguments, IReadOnlyList<ArgumentValue> valueList)
         {
-            return this.valueList.SingleOrDefault(z => z.IsMatch(name));
-        }
-
-        private string Value(string value)
-        {
-            if (value.StartsWith("\\"))
+            if (valueList.Count == 0) return;
+            
+            var requires = new Queue<ArgumentValue>(valueList.Where(z => !z.ParameterProperties.IsOptional));
+            
+            ArgumentValue TryGetByName(string name)
             {
-                value = value.Substring(1);
+                return valueList.SingleOrDefault(z => z.IsMatch(name));
             }
 
-            return value;
-        }
-
-        private void HandleNameValuePair(string name)
-        {
-            (string n, string v) TrySplitName()
+            string UnescapeValue(string value)
             {
-                if (name.Contains('='))
+                if (value.StartsWith("\\"))
                 {
-                    var g = name.Split(new [] { '=' }, 2);
-                    return (g[0], g[1]);
+                    value = value.Substring(1);
                 }
-                else if (name.Contains(':'))
-                {
-                    var g = name.Split(new[] { ':' }, 2);
-                    return (g[0], g[1]);
-                }
-                else
-                {
-                    return (name, null);
-                }
+
+                return value;
             }
 
-            var (n, v) = TrySplitName();
-
-            if (this.TryGetByName(n) is ArgumentValue slot)
+            bool OnNameValuePair(string name)
             {
-                this.arguments.UseOne();
+                (string n, string v) TrySplitName()
+                {
+                    if (name.Contains('='))
+                    {
+                        var g = name.Split(new[] { '=' }, 2);
+                        return (g[0], g[1]);
+                    }
+                    else if (name.Contains(':'))
+                    {
+                        var g = name.Split(new[] { ':' }, 2);
+                        return (g[0], g[1]);
+                    }
+                    else
+                    {
+                        return (name, null);
+                    }
+                }
 
-                if (v == null && this.arguments.TryGetNextArgument(out var next) && !next.StartsWith("-"))
+                var (n, v) = TrySplitName();
+
+                if (TryGetByName(n) is ArgumentValue av)
                 {
-                    this.arguments.UseOne();
-                    slot.AddValue(next);
+                    arguments.UseOne();
+
+                    if (v == null &&
+                        arguments.TryGetNextArgument(out var next) &&
+                        !next.StartsWith("-"))
+                    {
+                        arguments.UseOne();
+                        av.AddValue(UnescapeValue(next));
+                    }
+                    else
+                    {
+                        av.AddValue(string.Empty);
+                    }
+                    return true;
                 }
-                else
-                {
-                    slot.AddValue("");
-                }
+
+                return false;
             }
-        }
 
-        private void HandleFlags(string flags)
-        {
-            var avs = new List<ArgumentValue>();
-            foreach (var ch in flags)
+            bool OnSingleCharFlags(string flags)
             {
-                if (this.TryGetByName(ch.ToString()) is ArgumentValue av)
+                var avs = new List<ArgumentValue>();
+                foreach (var ch in flags)
                 {
-                    avs.Add(av);
+                    if (TryGetByName(ch.ToString()) is ArgumentValue av)
+                    {
+                        avs.Add(av);
+                    }
+                    else
+                    {
+                        return arguments.UnknownArguments<bool>();
+                    }
                 }
-                else
-                {
-                    return;
-                }
+                avs.ForEach(z => z.AddValue(string.Empty));
+                arguments.UseOne();
+                return true;
             }
-            avs.ForEach(z => z.AddValue(""));
-        }
 
-        private void HandleValue(string value)
-        {
-            if (this.requires.Count > 0)
+            bool OnValueOnly(string value)
             {
-                var val = this.requires.Peek();
-                if (val.IsAcceptValue())
+                while (requires.Count > 0)
                 {
-                    val.AddValue(value);
-                    this.arguments.UseOne();
+                    var val = requires.Peek();
+                    if (val.IsAcceptValue())
+                    {
+                        val.AddValue(value);
+                        arguments.UseOne();
+                        return true;
+                    }
+                    if (!val.IsAcceptValue())
+                    {
+                        requires.Dequeue();
+                    }
                 }
-                if (!val.IsAcceptValue())
-                {
-                    this.requires.Dequeue();
-                }
+                return false;
             }
-        }
 
-        private void ParseCore()
-        {
-            while (this.arguments.TryGetNextArgument(out var value))
+            // start
+            while (arguments.TryGetNextArgument(out var value))
             {
-                var cur = this.arguments.UsedArgvCount;
+                var cur = arguments.UsedArgvCount;
 
                 if (value.StartsWith("--"))
                 {
-                    this.HandleNameValuePair(value.Substring(2));
+                    if (!OnNameValuePair(value.Substring(2))) return;
                 }
                 else if (value.StartsWith("-"))
                 {
-                    this.HandleFlags(value.Substring(1));
+                    if (!OnSingleCharFlags(value.Substring(1))) return;
                 }
                 else
                 {
-                    this.HandleValue(this.Value(value));
+                    if (!OnValueOnly(UnescapeValue(value))) return;
                 }
 
-                if (cur == this.arguments.UsedArgvCount) return;
+                Debug.Assert(cur != arguments.UsedArgvCount);
             }
-        }
-
-        public void Parse(IArgumentList args, IReadOnlyList<ArgumentValue> values)
-        {
-            if (values.Count == 0) return;
-
-            // set var
-            this.arguments = args;
-            this.valueList = values;
-            this.requires = new Queue<ArgumentValue>(values.Where(z => !z.ParameterProperties.IsOptional));
-
-            // start
-            this.ParseCore();
         }
     }
 }
