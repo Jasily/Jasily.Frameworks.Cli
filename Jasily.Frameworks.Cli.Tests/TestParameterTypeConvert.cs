@@ -1,5 +1,4 @@
 ﻿using System;
-using Jasily.Frameworks.Cli.Attributes;
 using Jasily.Frameworks.Cli.Attributes.Parameters;
 using Jasily.Frameworks.Cli.Tests.Olds;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -84,22 +83,24 @@ namespace Jasily.Frameworks.Cli.Tests
 
         public class BooleanParamerterCommandClass
         {
-            public bool WithOutAttribute(bool value) => value;
+            public bool Func(bool value) => value;
 
-            public bool WithAttribute([BoolParameter(true, "x"), BoolParameter(false, "y")] bool value) => value;
+            public bool FuncA([BoolParameter(true, "x"), BoolParameter(false, "y")] bool value) => value;
         }
 
         [TestMethod]
-        public void BooleanTypedParamerterConvertCorrect()
+        public void TestBooleanTypedParamerterConvert()
         {
-            var engine = this.Fire(new BooleanParamerterCommandClass(), out var _);
+            var executor = this.Fire(new BooleanParamerterCommandClass(), out var _);
+            
+            Assert.AreEqual(true, executor.Execute(new[] { nameof(BooleanParamerterCommandClass.Func), "true" }).Value);
+            Assert.AreEqual(false, executor.Execute(new[] { nameof(BooleanParamerterCommandClass.Func), "false" }).Value);
 
-            Assert.AreEqual(true, engine.Execute(new[] { nameof(BooleanParamerterCommandClass.WithOutAttribute), "true" }).Value);
-            Assert.AreEqual(false, engine.Execute(new[] { nameof(BooleanParamerterCommandClass.WithOutAttribute), "false" }).Value);
-            Assert.AreEqual(null, engine.Execute(new[] { nameof(BooleanParamerterCommandClass.WithOutAttribute), "x" }).Value);
-            Assert.AreEqual(null, engine.Execute(new[] { nameof(BooleanParamerterCommandClass.WithOutAttribute), "y" }).Value);
-            Assert.AreEqual(true, engine.Execute(new[] { nameof(BooleanParamerterCommandClass.WithAttribute), "x" }).Value);
-            Assert.AreEqual(false, engine.Execute(new[] { nameof(BooleanParamerterCommandClass.WithAttribute), "y" }).Value);
+            Assert.AreEqual(null, executor.Execute(new[] { nameof(BooleanParamerterCommandClass.Func), "x" }).Value);
+            Assert.AreEqual(null, executor.Execute(new[] { nameof(BooleanParamerterCommandClass.Func), "y" }).Value);
+
+            Assert.AreEqual(true, executor.Execute(new[] { nameof(BooleanParamerterCommandClass.FuncA), "x" }).Value);
+            Assert.AreEqual(false, executor.Execute(new[] { nameof(BooleanParamerterCommandClass.FuncA), "y" }).Value);
         }
     }
 }

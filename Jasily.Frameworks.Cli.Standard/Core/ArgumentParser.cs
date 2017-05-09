@@ -9,7 +9,7 @@ using JetBrains.Annotations;
 
 namespace Jasily.Frameworks.Cli.Core
 {
-    public class ArgumentParser : IArgumentParser
+    internal class ArgumentParser : IArgumentParser
     {
         public void Parse(IArgumentList arguments, IReadOnlyList<ArgumentValue> valueList)
         {
@@ -34,41 +34,44 @@ namespace Jasily.Frameworks.Cli.Core
 
             bool OnNameValuePair(string name)
             {
-                (string n, string v) TrySplitName()
+                KeyValuePair<string, string> TrySplitName()
                 {
                     if (name.Contains('='))
                     {
                         var g = name.Split(new[] { '=' }, 2);
-                        return (g[0], g[1]);
+                        return new KeyValuePair<string, string>(g[0], g[1]);
                     }
                     else if (name.Contains(':'))
                     {
                         var g = name.Split(new[] { ':' }, 2);
-                        return (g[0], g[1]);
+                        return new KeyValuePair<string, string>(g[0], g[1]);
                     }
                     else
                     {
-                        return (name, null);
+                        return new KeyValuePair<string, string>(name, null);
                     }
                 }
 
-                var (n, v) = TrySplitName();
+                var kvp = TrySplitName();
 
-                if (TryGetByName(n) is ArgumentValue av)
+                if (TryGetByName(kvp.Key) is ArgumentValue av)
                 {
                     arguments.UseOne();
 
-                    if (v == null &&
-                        arguments.TryGetNextArgument(out var next) &&
-                        !next.StartsWith("-"))
+                    var value = kvp.Value;
+                    if (value == null)
                     {
-                        arguments.UseOne();
-                        av.AddValue(UnescapeValue(next));
+                        if (arguments.TryGetNextArgument(out var x) &&
+                            !x.StartsWith("-") &&
+                            x != "\\")
+                        {
+                            arguments.UseOne();
+                            value = x;
+                            
+                        }
                     }
-                    else
-                    {
-                        av.AddValue(string.Empty);
-                    }
+
+                    av.AddValue(value == null ? string.Empty : UnescapeValue(value));
                     return true;
                 }
 
@@ -117,6 +120,12 @@ namespace Jasily.Frameworks.Cli.Core
             while (arguments.TryGetNextArgument(out var value))
             {
                 var cur = arguments.UsedArgvCount;
+
+                if (value == "\\") // end
+                {
+                    arguments.UseOne();
+                    return;
+                }
 
                 if (value.StartsWith("--"))
                 {
