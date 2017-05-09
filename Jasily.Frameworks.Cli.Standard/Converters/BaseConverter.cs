@@ -27,9 +27,12 @@ namespace Jasily.Frameworks.Cli.Converters
             {
                 throw;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw new ConvertException($"connot convert value <{value}> to type <{typeof(T).Name}>");
+                var msg = string.IsNullOrWhiteSpace(e.Message)
+                    ? $"connot convert value <{value}> to type <{typeof(T).Name}>"
+                    : $"connot convert value <{value}> to type <{typeof(T).Name}>: {e.Message}";
+                throw new ConvertException(msg, e);
             }
         }
 
