@@ -57,7 +57,7 @@ namespace Jasily.Frameworks.Cli.Commands
         {
             var args = session.Argv;
 
-            if (this._commands.Count == 0) return session.UnknownArguments<BindedCommand>();
+            if (this._commands.Count == 0) return session.UnknownCommand<BindedCommand>();
 
             if (args.TryGetNextArgument(out var name))
             {
