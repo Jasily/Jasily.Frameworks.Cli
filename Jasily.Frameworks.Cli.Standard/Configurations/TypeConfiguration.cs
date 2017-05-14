@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading;
 using Jasily.Core;
 using Jasily.DependencyInjection.MethodInvoker;
+using Jasily.Extensions.System.Collections.Generic;
+using Jasily.Extensions.System.Reflection;
 using Jasily.Frameworks.Cli.Attributes;
 using Jasily.Frameworks.Cli.Commands;
 using Jasily.Frameworks.Cli.Converters;

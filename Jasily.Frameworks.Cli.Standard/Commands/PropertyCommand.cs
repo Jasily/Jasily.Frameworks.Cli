@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using Jasily.DependencyInjection.MethodInvoker;
+using Jasily.Extensions.System.Collections.Generic;
 using Jasily.Frameworks.Cli.Attributes;
 using Jasily.Frameworks.Cli.Configurations;
 using Microsoft.Extensions.DependencyInjection;

@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Jasily.DependencyInjection.AwaiterAdapter;
 using Jasily.DependencyInjection.MethodInvoker;
+using Jasily.Extensions.System.Collections.Generic;
+using Jasily.Extensions.System.Reflection;
 using Jasily.Frameworks.Cli.Attributes;
 using Jasily.Frameworks.Cli.Configurations;
 using Jasily.Frameworks.Cli.Core;

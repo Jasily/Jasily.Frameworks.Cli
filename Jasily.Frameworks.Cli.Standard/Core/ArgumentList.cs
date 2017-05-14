@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
+using Jasily.Extensions.System.Collections.Generic;
 using Jasily.Frameworks.Cli.Attributes;
 using JetBrains.Annotations;
 

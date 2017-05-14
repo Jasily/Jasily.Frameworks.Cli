@@ -42,7 +42,7 @@
       <HintPath>..\packages\Jasily.Core.PCL259.0.0.0.5\lib\net45\Jasily.Core.PCL259.dll</HintPath>
     </Reference>
     <Reference Include="Jasily.DependencyInjection.AwaiterAdapter.Standard, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Jasily.DependencyInjection.AwaiterAdapter.Standard.0.0.0.4\lib\netstandard1.4\Jasily.DependencyInjection.AwaiterAdapter.Standard.dll</HintPath>
+      <HintPath>..\packages\Jasily.DependencyInjection.AwaiterAdapter.Standard.0.0.0.5\lib\netstandard1.4\Jasily.DependencyInjection.AwaiterAdapter.Standard.dll</HintPath>
     </Reference>
     <Reference Include="Jasily.DependencyInjection.MemberInjection.Standard, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Jasily.DependencyInjection.MemberInjection.Standard.0.0.1.0\lib\netstandard1.4\Jasily.DependencyInjection.MemberInjection.Standard.dll</HintPath>
@@ -51,10 +51,10 @@
       <HintPath>..\packages\Jasily.DependencyInjection.MethodInvoker.Standard.0.0.1.7\lib\netstandard1.4\Jasily.DependencyInjection.MethodInvoker.Standard.dll</HintPath>
     </Reference>
     <Reference Include="Jasily.Extensions.System.PCL259, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Jasily.Extensions.System.PCL259.0.0.0.4\lib\net45\Jasily.Extensions.System.PCL259.dll</HintPath>
+      <HintPath>..\packages\Jasily.Extensions.System.PCL259.0.0.1.0\lib\net45\Jasily.Extensions.System.PCL259.dll</HintPath>
     </Reference>
     <Reference Include="Jasily.Extensions.System.Standard, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Jasily.Extensions.System.Standard.0.0.0.2\lib\netstandard1.4\Jasily.Extensions.System.Standard.dll</HintPath>
+      <HintPath>..\packages\Jasily.Extensions.System.Standard.0.0.1.0\lib\netstandard1.4\Jasily.Extensions.System.Standard.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.Annotations, Version=10.4.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <HintPath>..\packages\JetBrains.Annotations.10.4.0\lib\net\JetBrains.Annotations.dll</HintPath>
