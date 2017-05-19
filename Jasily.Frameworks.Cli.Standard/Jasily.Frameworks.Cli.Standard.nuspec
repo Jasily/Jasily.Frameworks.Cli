@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>Jasily.Frameworks.Cli.Standard</id>
-        <version>0.0.1.9</version>
+        <version>0.0.1.10</version>
         <title>Jasily.Frameworks.Cli.Standard</title>
         <authors>Jasily</authors>
         <owners>Jasily</owners>
@@ -14,10 +14,10 @@
         <copyright>Copyright 2017</copyright>
         <tags>cli console framework</tags>
         <dependencies>
-            <dependency id="Jasily.DependencyInjection.MethodInvoker.Standard" version="0.0.1.6" />
-            <dependency id="Jasily.DependencyInjection.AwaiterAdapter.Standard" version="0.0.0.2" />
+            <dependency id="Jasily.DependencyInjection.MethodInvoker.Standard" version="0.0.1.7" />
+            <dependency id="Jasily.DependencyInjection.AwaiterAdapter.Standard" version="0.0.0.5" />
             <dependency id="Microsoft.Extensions.DependencyInjection" version="1.1.0" />
-            <dependency id="Jasily.Extensions.System" version="0.0.0.1" />
+            <dependency id="Jasily.Extensions.System" version="0.0.0.2" />
             <dependency id="JetBrains.Annotations" version="10.4.0" />
         </dependencies>
     </metadata>
