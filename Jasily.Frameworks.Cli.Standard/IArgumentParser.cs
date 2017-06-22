@@ -9,6 +9,6 @@ namespace Jasily.Frameworks.Cli
     /// </summary>
     public interface IArgumentParser
     {
-        void Parse(IArgumentList args, IReadOnlyList<ArgumentValue> values);
+        void Parse(IArgumentList args, IReadOnlyList<IArgumentValue> values);
     }
 }

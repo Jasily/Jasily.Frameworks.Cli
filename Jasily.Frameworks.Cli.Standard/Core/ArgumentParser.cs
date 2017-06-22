@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using Jasily.Frameworks.Cli.Arguments;
 using Jasily.Frameworks.Cli.Core;
 using Jasily.Frameworks.Cli.Exceptions;
 using JetBrains.Annotations;
@@ -11,13 +12,18 @@ namespace Jasily.Frameworks.Cli.Core
 {
     internal class ArgumentParser : IArgumentParser
     {
-        public void Parse(IArgumentList arguments, IReadOnlyList<ArgumentValue> valueList)
+        /// <summary>
+        /// use '\' end with single command.
+        /// </summary>
+        private const string CommandEndingString = "\\";
+
+        public void Parse(IArgumentList arguments, IReadOnlyList<IArgumentValue> valueList)
         {
             if (valueList.Count == 0) return;
             
-            var requires = new Queue<ArgumentValue>(valueList.Where(z => !z.ParameterProperties.IsOptional));
-            
-            ArgumentValue TryGetByName(string name)
+            var requires = new Queue<IArgumentValue>(valueList.Where(z => !z.ParameterProperties.IsOptional));
+
+            IArgumentValue TryGetByName(string name)
             {
                 return valueList.SingleOrDefault(z => z.IsMatch(name));
             }
@@ -63,7 +69,7 @@ namespace Jasily.Frameworks.Cli.Core
                     {
                         if (arguments.TryGetNextArgument(out var x) &&
                             !x.StartsWith("-") &&
-                            x != "\\")
+                            x != CommandEndingString)
                         {
                             arguments.UseOne();
                             value = x;
@@ -121,7 +127,7 @@ namespace Jasily.Frameworks.Cli.Core
             {
                 var cur = arguments.UsedArgvCount;
 
-                if (value == "\\") // end
+                if (value == CommandEndingString)
                 {
                     arguments.UseOne();
                     return;

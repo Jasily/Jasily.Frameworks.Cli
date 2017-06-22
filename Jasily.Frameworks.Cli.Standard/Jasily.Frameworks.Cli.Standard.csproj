@@ -12,6 +12,7 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>TRACE;DEBUG;NETSTANDARD1_4;JETBRAINS_ANNOTATIONS</DefineConstants>
+    <DocumentationFile>bin\Debug\netstandard1.4\Jasily.Frameworks.Cli.Standard.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

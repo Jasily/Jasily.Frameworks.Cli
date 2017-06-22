@@ -215,6 +215,16 @@ namespace Jasily.Frameworks.Cli.Configurations
             private readonly HashSet<string> _nameSet;
             private readonly List<ICondition> _conditions= new List<ICondition>();
 
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="parameter"></param>
+            /// <returns></returns>
+            private static string GetErrorHeader(ParameterInfo parameter)
+            {
+                return $"Error on Parameter <{parameter.Name}> of {typeof(TClass).Name}.{parameter.Member.Name}():";
+            }
+
             internal ParameterConfiguration(MethodConfiguration method, ParameterInfo parameter,
                 Dictionary<string, ParameterInfo> conflictNameMap, StringComparer comaprer)
             {
@@ -231,7 +241,7 @@ namespace Jasily.Frameworks.Cli.Configurations
                     if (conflictNameMap.TryGetValue(name, out var p))
                     {
                         var msg = new StringBuilder()
-                            .AppendLine($"Parameter Definition Error on {typeof(TClass).Name}.{method.Method.Name}:")
+                            .AppendLine(GetErrorHeader(parameter))
                             .AppendLine($"   Name <{name}> is Conflict with Another Parameter <{p.Name}>.");
                         throw new InvalidOperationException(msg.ToString());
                     }
@@ -243,8 +253,10 @@ namespace Jasily.Frameworks.Cli.Configurations
                     var converter = method.ServiceProvider.GetService(typeof(Converters.IValueConverter<>).FastMakeGenericType(type));
                     if (converter == null)
                     {
-                        var msg = $"convert string {this.ParameterInfo.ParameterType.Name} is not supported.";
-                        throw new InvalidOperationException(msg);
+                        var msg = new StringBuilder()
+                            .AppendLine(GetErrorHeader(parameter))
+                            .AppendLine($"    convert string to {this.ParameterInfo.ParameterType.Name} is NOT supported.");
+                        throw new InvalidOperationException(msg.ToString());
                     }
                     return (IValueConverter)converter;
                 }

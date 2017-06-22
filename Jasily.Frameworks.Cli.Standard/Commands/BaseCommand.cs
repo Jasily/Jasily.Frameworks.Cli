@@ -9,6 +9,7 @@ using Jasily.DependencyInjection.AwaiterAdapter;
 using Jasily.DependencyInjection.MethodInvoker;
 using Jasily.Extensions.System.Collections.Generic;
 using Jasily.Extensions.System.Reflection;
+using Jasily.Frameworks.Cli.Arguments;
 using Jasily.Frameworks.Cli.Attributes;
 using Jasily.Frameworks.Cli.Configurations;
 using Jasily.Frameworks.Cli.Core;
@@ -46,7 +47,7 @@ namespace Jasily.Frameworks.Cli.Commands
                     {
                         var avs = this.ParameterConfigurations
                             .Where(z => !z.IsResolveByEngine)
-                            .Select(z => new ArgumentValue(z))
+                            .Select(ArgumentValue.Create)
                             .ToArray()
                             .AsReadOnly();
                         serviceProvider.GetRequiredService<IArgumentParser>().Parse(session.Argv, avs);

@@ -16,7 +16,7 @@ namespace Jasily.Frameworks.Cli.Configurations
         ParameterInfo ParameterInfo { get; }
 
         /// <summary>
-        /// is parameter should resolve by engine.
+        /// is parameter should resolve by engine (<see cref="IServiceProvider"/>).
         /// </summary>
         bool IsResolveByEngine { get; }
 
