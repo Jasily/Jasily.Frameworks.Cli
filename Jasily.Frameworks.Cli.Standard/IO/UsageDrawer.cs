@@ -59,11 +59,11 @@ namespace Jasily.Frameworks.Cli.IO
         {
             this._sb.AppendLine("Usage:");
             this._sb.Append(' ', IndentCell * 1).AppendLine($"Parameters of Commands <{command.Names[0]}>:");
-            
+
             foreach (var parameter in parameters)
             {
                 if (parameter.IsResolveByEngine) continue;
-                
+
                 // content
                 this._sb.Append(' ', IndentCell * 2);
                 this._sb.Append(parameter.IsOptional ? "(optional)" : "(required)");
@@ -83,10 +83,16 @@ namespace Jasily.Frameworks.Cli.IO
                 {
                     this._sb.Append(parameter.ParameterInfo.ParameterType.Name);
 
+                    if (parameter.ParameterInfo.HasDefaultValue)
+                    {
+                        this._sb.Append(" = ");
+                        this._sb.Append(parameter.ParameterInfo.DefaultValue?.ToString() ?? "null");
+                    }
+
                     if (parameter.ParameterInfo.ParameterType.GetTypeInfo().IsEnum)
                     {
                         this._sb.Append(" (");
-                        this._sb.Append(string.Join(" | ", Enum.GetNames(parameter.ParameterInfo.ParameterType)));
+                        this._sb.Append(string.Join("|", Enum.GetNames(parameter.ParameterInfo.ParameterType)));
                         this._sb.Append(")");
                     }
                 }
