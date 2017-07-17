@@ -25,7 +25,8 @@ namespace Jasily.Frameworks.Cli.Converters
                 .AddSingleton<IValueConverter<double>, DoubleConverter>()
                 .AddSingleton<IValueConverter<decimal>, DecimalConverter>()
                 .AddSingleton<IValueConverter<DateTime>, DateTimeConverter>()
-                .AddSingleton<IValueConverter<string>, StringConverter>();
+                .AddSingleton<IValueConverter<string>, StringConverter>()
+                .AddSingleton(typeof(EnumConverter<>));
         }
     }
 }

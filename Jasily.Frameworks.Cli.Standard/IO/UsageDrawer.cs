@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using Jasily.Frameworks.Cli.Commands;
 using System.Linq;
+using System.Reflection;
 using Jasily.Frameworks.Cli.Configurations;
 
 namespace Jasily.Frameworks.Cli.IO
@@ -80,6 +82,13 @@ namespace Jasily.Frameworks.Cli.IO
                 else
                 {
                     this._sb.Append(parameter.ParameterInfo.ParameterType.Name);
+
+                    if (parameter.ParameterInfo.ParameterType.GetTypeInfo().IsEnum)
+                    {
+                        this._sb.Append(" (");
+                        this._sb.Append(string.Join(" | ", Enum.GetNames(parameter.ParameterInfo.ParameterType)));
+                        this._sb.Append(")");
+                    }
                 }
 
                 if (parameter.Names.Count > 1)

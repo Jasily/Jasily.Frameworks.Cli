@@ -250,7 +250,16 @@ namespace Jasily.Frameworks.Cli.Configurations
 
                 IValueConverter GetValueConverter(Type type)
                 {
-                    var converter = method.ServiceProvider.GetService(typeof(Converters.IValueConverter<>).FastMakeGenericType(type));
+                    Type t = null;
+                    if (type.GetTypeInfo().IsEnum)
+                    {
+                        t = typeof(EnumConverter<>).FastMakeGenericType(type);
+                    }
+                    if (t == null)
+                    {
+                        t = typeof(Converters.IValueConverter<>).FastMakeGenericType(type);
+                    }
+                    var converter = method.ServiceProvider.GetService(t);
                     if (converter == null)
                     {
                         var msg = new StringBuilder()

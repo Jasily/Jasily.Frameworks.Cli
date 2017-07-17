@@ -47,6 +47,8 @@ namespace Jasily.Frameworks.Cli.Tests
             public int[] Int32Array(int[] value) => value;
 
             public int[] Int32ParamsArray(params int[] value) => value;
+
+            public StringComparison Enum(StringComparison val) => val;
         }
 
         [TestMethod]
@@ -67,6 +69,8 @@ namespace Jasily.Frameworks.Cli.Tests
                 new[] { nameof(CommandClass.Int32Array), "5", "8" }).Value);
             CollectionAssert.AreEqual(new[] { 5, 8 }, (int[])executor.Execute(
                 new[] { nameof(CommandClass.Int32ParamsArray), "5", "8" }).Value);
+            Assert.AreEqual(StringComparison.InvariantCultureIgnoreCase,
+                executor.Execute(new[] { nameof(CommandClass.Enum), StringComparison.InvariantCultureIgnoreCase.ToString() }).Value);
         }
 
         [TestMethod]
