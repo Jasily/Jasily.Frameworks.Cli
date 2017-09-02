@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.4</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Jasily.Frameworks.Cli</RootNamespace>
   </PropertyGroup>
 
@@ -16,11 +16,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Jasily.DependencyInjection.AwaiterAdapter.Standard" Version="0.1.0.5" />
-    <PackageReference Include="Jasily.DependencyInjection.MethodInvoker.Standard" Version="0.1.0.5" />
-    <PackageReference Include="Jasily.Extensions.System.Standard" Version="0.1.0.5" />
-    <PackageReference Include="JetBrains.Annotations" Version="10.4.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="1.1.1" />
+    <PackageReference Include="Jasily.DependencyInjection.AwaiterAdapter.Standard" Version="0.1.0.7" />
+    <PackageReference Include="Jasily.DependencyInjection.MethodInvoker.Standard" Version="0.1.0.7" />
+    <PackageReference Include="JetBrains.Annotations" Version="11.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
   </ItemGroup>
 
 </Project>

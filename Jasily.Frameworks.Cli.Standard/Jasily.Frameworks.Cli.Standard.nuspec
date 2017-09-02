@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>Jasily.Frameworks.Cli.Standard</id>
-        <version>0.0.1.13</version>
+        <version>0.0.1.14</version>
         <title>Jasily.Frameworks.Cli.Standard</title>
         <authors>Jasily</authors>
         <owners>Jasily</owners>
@@ -14,15 +14,14 @@
         <copyright>Copyright 2017</copyright>
         <tags>cli console framework</tags>
         <dependencies>
-            <dependency id="Jasily.DependencyInjection.MethodInvoker.Standard" version="0.1.0.5" />
-            <dependency id="Jasily.DependencyInjection.AwaiterAdapter.Standard" version="0.1.0.5" />
-            <dependency id="Microsoft.Extensions.DependencyInjection" version="1.1.1" />
-            <dependency id="Jasily.Extensions.System.Standard" version="0.1.0.5" />
-            <dependency id="JetBrains.Annotations" version="10.4.0" />
+            <dependency id="Jasily.DependencyInjection.MethodInvoker.Standard" version="0.1.0.7" />
+            <dependency id="Jasily.DependencyInjection.AwaiterAdapter.Standard" version="0.1.0.7" />
+            <dependency id="Microsoft.Extensions.DependencyInjection" version="2.0.0" />
+            <dependency id="JetBrains.Annotations" version="11.0.0" />
         </dependencies>
     </metadata>
     <files>
-        <file src="bin\Release\netstandard1.4\Jasily.Frameworks.Cli.Standard.dll" target="lib\netstandard1.4\Jasily.Frameworks.Cli.Standard.dll" />
-        <file src="bin\Release\netstandard1.4\Jasily.Frameworks.Cli.Standard.xml" target="lib\netstandard1.4\Jasily.Frameworks.Cli.Standard.xml" />
+        <file src="bin\Release\netstandard2.0\Jasily.Frameworks.Cli.Standard.dll" target="lib\netstandard2.0\Jasily.Frameworks.Cli.Standard.dll" />
+        <file src="bin\Release\netstandard2.0\Jasily.Frameworks.Cli.Standard.xml" target="lib\netstandard2.0\Jasily.Frameworks.Cli.Standard.xml" />
     </files>
 </package>
